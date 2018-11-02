@@ -1,7 +1,9 @@
-# volkanic
+volkanic
+========
 
-A simple command runner.
+A simple command runner. To install
 
+    python -m pip install volkanic
 
 Create a YAML file, e.g. `print.yml`
 
