@@ -69,12 +69,10 @@ class CommandConf(object):
         getattr(m, call)(*args, **kwargs)
 
     def __call__(self, cmd):
-        params = dict(self.commands['_global'])
-        try:
-            params.update(self.commands[cmd])
-        except KeyError:
+        if cmd not in self.commands:
             raise CommandNotFound(str(cmd))
-
+        params = dict(self.commands['_global'])
+        params.update(self.commands[cmd])
         with remember_cwd():
             os.chdir(params.get('cd', '.'))
             self._execute(params)
@@ -84,14 +82,14 @@ class CommandConf(object):
         from argparse import ArgumentParser
         kwargs.setdefault('description', 'volkanic command-conf runner')
         parser = ArgumentParser(prog=prog, **kwargs)
-        parser.add_argument('path', help='a YAML file')
+        parser.add_argument('name', help='a YAML file')
         parser.add_argument(
-            'subcmd', nargs='?', default='default',
-            help='a sub command',
+            'key', nargs='?', default='default',
+            help='a top-level key in the YAML file',
         )
         ns = parser.parse_args(args=args)
-        cconf = cls.from_yaml(ns.path, default_dir)
-        cconf(ns.subcmd)
+        cconf = cls.from_yaml(ns.name, default_dir)
+        cconf(ns.key)
 
 
 class CommandRegistry(object):
