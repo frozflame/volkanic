@@ -57,14 +57,16 @@ class CommandConf(object):
 
     @staticmethod
     def _execute(params):
-        prefix = params.get('module_prefix', '')
-        modpath = prefix + params['module']
-        module = importlib.import_module(modpath)
-        call = getattr(module, params['call'])
+        # only 'module' is a must-have
+        prefix = params.get('prefix', '')
+        module = prefix + params['module']
+        call = params.get('call', 'run')
         args = params.get('args', [])
+        kwargs = params.get('kwargs', {})
         if not isinstance(args, (list, tuple)):
             args = [args]
-        call(*args, **params.get('kwargs', {}))
+        m = importlib.import_module(module)
+        getattr(m, call)(*args, **kwargs)
 
     def __call__(self, cmd):
         params = dict(self.commands['_global'])
