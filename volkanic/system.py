@@ -25,52 +25,49 @@ class CommandNotFound(KeyError):
 class CommandConf(object):
     def __init__(self, commands):
         self.commands = dict(commands)
-        self.module_prefix = ''
+        self.commands.setdefault('_global', {})
 
     @classmethod
-    def from_yaml(cls, name, defaultdir=None):
+    def from_yaml(cls, name, default_dir=None):
         import yaml
         ext = os.path.splitext(name)[1].lower()
         if ext not in ['.yml', '.yaml']:
             name += '.yml'
-        path = cls._locate(name, defaultdir)
+        path = cls._locate(name, default_dir)
         return cls(yaml.load(open(path)))
 
     @classmethod
-    def from_json(cls, name, defaultdir=None):
+    def from_json(cls, name, default_dir=None):
         import json
         ext = os.path.splitext(name)[1].lower()
         if ext != '.json':
             name += '.json'
-        path = cls._locate(name, defaultdir)
+        path = cls._locate(name, default_dir)
         return cls(json.load(open(path)))
 
     @staticmethod
-    def _locate(path, defaultdir):
+    def _locate(path, default_dir):
         paths = [path]
-        if defaultdir is not None:
-            paths.append(os.path.join(defaultdir, path))
+        if default_dir is not None:
+            paths.append(os.path.join(default_dir, path))
         for path in paths:
             if os.path.isfile(path):
                 return path
         raise FileNotFoundError(path)
 
-    def _execute(self, params):
-        modpath = params['module']
-        if not modpath.startswith(self.module_prefix):
-            modpath = self.module_prefix + modpath
-            modpath = modpath.replace('..', '.')
-
+    @staticmethod
+    def _execute(params):
+        prefix = params.get('module_prefix', '')
+        modpath = prefix + params['module']
         module = importlib.import_module(modpath)
         call = getattr(module, params['call'])
         args = params.get('args', [])
         if not isinstance(args, (list, tuple)):
             args = [args]
         call(*args, **params.get('kwargs', {}))
-        # call(*args)
 
     def __call__(self, cmd):
-        params = self.commands.get('_global', {}).copy()
+        params = dict(self.commands['_global'])
         try:
             params.update(self.commands[cmd])
         except KeyError:
@@ -79,6 +76,20 @@ class CommandConf(object):
         with remember_cwd():
             os.chdir(params.get('cd', '.'))
             self._execute(params)
+
+    @classmethod
+    def run(cls, prog=None, args=None, default_dir=None, **kwargs):
+        from argparse import ArgumentParser
+        kwargs.setdefault('description', 'volkanic command-conf runner')
+        parser = ArgumentParser(prog=prog, **kwargs)
+        parser.add_argument('path', help='a YAML file')
+        parser.add_argument(
+            'subcmd', nargs='?', default='default',
+            help='a sub command',
+        )
+        ns = parser.parse_args(args=args)
+        cconf = cls.from_yaml(ns.path, default_dir)
+        cconf(ns.subcmd)
 
 
 class CommandRegistry(object):

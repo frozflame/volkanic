@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals, print_function
 
-from volkanic.system import CommandRegistry as _CReg
+import volkanic
 
 
 def run(prog, _):
@@ -13,21 +13,9 @@ def run(prog, _):
     print('\nprog:', repr(prog), sep='\t', file=sys.stderr)
 
 
-def run_command_conf(prog=None, args=None):
-    from argparse import ArgumentParser
-    from volkanic.system import CommandConf
-    desc = 'volkanic command-conf runner'
-    parser = ArgumentParser(prog=prog, description=desc)
-    parser.add_argument('path', help='a YAML file')
-    parser.add_argument(
-        'subcmd', nargs='?', default='default',
-        help='a sub command',
-    )
-    ns = parser.parse_args(args=args)
-    CommandConf.from_yaml(ns.path)(ns.subcmd)
+run_command_conf = volkanic.CommandConf.run
 
-
-registry = _CReg({
+registry = volkanic.CommandRegistry({
     'volkanic.default': 'argv',
     'volkanic.default:run_command_conf': 'runconf'
 })
