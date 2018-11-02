@@ -6,7 +6,7 @@ import re
 
 from setuptools import setup, find_packages
 
-# import joker; exit(1)
+# import volkanic; exit(1)
 # DO NOT import your package from your setup.py
 
 
