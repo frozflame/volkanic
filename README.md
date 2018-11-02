@@ -10,8 +10,8 @@ default:
     module: builtins
     call: print
     args:
-    - Hello
-    - Python
+    - volkanic
+    - command
     kwargs:
         sep: "-"
         end: "~"
@@ -21,5 +21,6 @@ default:
 Run
 
 ```bash
-volk runconf print.yml
+$ volk runconf print.yml
+volkanic-command~
 ```
