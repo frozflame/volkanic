@@ -24,10 +24,11 @@ def load_symbol(symbolpath):
 
 
 def load_variables(*contexts):
+    import re
     scope = {}
     for ctx in contexts:
         if not isinstance(ctx, dict):
-            ctx = {x.split('.')[-1]: x for x in ctx}
+            ctx = {re.split('[.:]', x)[-1]: x for x in ctx}
         for key, val in ctx.items():
             scope[key] = load_symbol(val)
     return scope
