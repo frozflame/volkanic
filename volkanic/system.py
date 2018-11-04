@@ -23,6 +23,16 @@ def load_symbol(symbolpath):
     return symbol
 
 
+def load_variables(*contexts):
+    scope = {}
+    for ctx in contexts:
+        if not isinstance(ctx, dict):
+            ctx = {x.split('.')[-1]: x for x in ctx}
+        for key, val in ctx.items():
+            scope[key] = load_symbol(val)
+    return scope
+
+
 @contextlib.contextmanager
 def remember_cwd():
     curdir = os.getcwd()
