@@ -9,6 +9,20 @@ import os
 import sys
 
 
+def subattr(obj, *names):
+    for x in names:
+        obj = getattr(obj, x)
+    return obj
+
+
+def load_symbol(symbolpath):
+    parts = symbolpath.split(':', 1)
+    symbol = importlib.import_module(parts.pop(0))
+    if parts:
+        symbol = subattr(symbol, *parts[0].split('.'))
+    return symbol
+
+
 @contextlib.contextmanager
 def remember_cwd():
     curdir = os.getcwd()
@@ -66,7 +80,7 @@ class CommandConf(object):
         if not isinstance(args, (list, tuple)):
             args = [args]
         m = importlib.import_module(module)
-        getattr(m, call)(*args, **kwargs)
+        subattr(m, *call.split('.'))(*args, **kwargs)
 
     def __call__(self, cmd):
         if cmd not in self.commands:
@@ -119,7 +133,4 @@ class CommandRegistry(object):
 
         if ':' not in dotpath:
             dotpath += ':run'
-
-        dotpath, funcname = dotpath.split(':')
-        mod = importlib.import_module(dotpath)
-        getattr(mod, funcname)(prog, argv[2:])
+        return load_symbol(dotpath)(prog, argv[2:])
