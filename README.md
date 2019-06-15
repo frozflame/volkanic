@@ -64,39 +64,48 @@ In one of your functional modules, e.g. `newpkg/newpkg/formatter.py`,
 provide a entry function which takes exactly 2 arguments:
 
 
-    def format_text(path):
-        ...
+```
+def format_text(path):
+    # actual code here
+    return
 
-    def run(prog=None, args=None):
-        desc = 'human readable formatter'
-        parser = argparse.ArgumentParser(prog=prog, description=desc)
-        parser.add_argument('-i', '--input-file', help='path to your input file')
-        ns = parser.parse_args(args)
-        format_text(ns.input_file)
+
+def run(prog=None, args=None):
+    desc = 'human readable formatter'
+    parser = argparse.ArgumentParser(prog=prog, description=desc)
+    parser.add_argument('-i', '--input-file', help='path to your input file')
+    ns = parser.parse_args(args)
+    format_text(ns.input_file)
+```
 
 
 Sub-command registry in `newpkg/newpkg/main.py`:
 
-    import volkanic
 
-    entries = {
-        # shorthand for "newpkg.formatter:run": "fmt",
-        "newpkg.formatter": "fmt",
-        "newpkg.parsers:run_yml_parser": "yml",
-        "newpkg.parsers:run_ini_parser": "ini",
-        ...
-    }
-    registry = volkanic.CommandRegistry(entries)
+```python
+import volkanic
+
+entries = {
+    # shorthand for "newpkg.formatter:run": "fmt",
+    "newpkg.formatter": "fmt",
+    "newpkg.parsers:run_yml_parser": "yml",
+    "newpkg.parsers:run_ini_parser": "ini",
+    # ...
+}
+registry = volkanic.CommandRegistry(entries)
+```
 
 
 
 Configure top-command in `newpkg/setup.py`:
 
-    setup(
-        name="Flask",
-        ...
-        entry_points={"console_scripts": ["newcmd = newpkg.main:registry"]},
-    )
+```python
+setup(
+    name="Flask",
+    ...
+    entry_points={"console_scripts": ["newcmd = newpkg.main:registry"]},
+)
+```
 
 
 Install package `newpkg` or link with `python3 setup.py develop`.
