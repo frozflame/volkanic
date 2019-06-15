@@ -3,6 +3,9 @@
 
 from __future__ import unicode_literals, print_function
 
+import importlib
+import os
+
 import volkanic
 
 
@@ -17,7 +20,6 @@ def _macos_open(path):
 
 
 def _windows_open(path):
-    import os
     os.startfile(path)
 
 
@@ -34,6 +36,24 @@ def desktop_open(*paths):
         handler(path)
 
 
+def where(name):
+    mod = importlib.import_module(name)
+    path = getattr(mod, '__file__', 'NotAvailable')
+    dir_, filename = os.path.split(path)
+    if filename.startswith('__init__.'):
+        return dir_
+    return path
+
+
+def run_where(_, args):
+    for arg in args:
+        try:
+            path = where(arg)
+            print(arg, path, sep='\t')
+        except ModuleNotFoundError:
+            print(arg, 'ModuleNotFoundError', sep='\t')
+
+
 def run_argv_debug(prog, _):
     import sys
     for ix, arg in enumerate(sys.argv):
@@ -48,6 +68,7 @@ def run_desktop_open(_, args):
 run_command_conf = volkanic.CommandConf.run
 
 registry = volkanic.CommandRegistry({
+    'volkanic.default:run_where': 'where',
     'volkanic.default:run_argv_debug': 'a',
     'volkanic.default:run_desktop_open': 'o',
     'volkanic.default:run_command_conf': 'runconf',

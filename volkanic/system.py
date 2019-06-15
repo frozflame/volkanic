@@ -124,7 +124,7 @@ class CommandRegistry(object):
 
     def show_commands(self):
         print('availabe commands:')
-        for cmd in self.commands:
+        for cmd in sorted(self.commands):
             print('-', cmd)
 
     def __call__(self, argv=None):
