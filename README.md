@@ -64,7 +64,7 @@ In one of your functional modules, e.g. `newpkg/newpkg/formatter.py`,
 provide a entry function which takes exactly 2 arguments:
 
 
-```
+```python3
 def format_text(path):
     # actual code here
     return
@@ -90,7 +90,6 @@ entries = {
     "newpkg.formatter": "fmt",
     "newpkg.parsers:run_yml_parser": "yml",
     "newpkg.parsers:run_ini_parser": "ini",
-    # ...
 }
 registry = volkanic.CommandRegistry(entries)
 ```
@@ -101,9 +100,9 @@ Configure top-command in `newpkg/setup.py`:
 
 ```python
 setup(
-    name="Flask",
-    ...
+    name="newpkg",
     entry_points={"console_scripts": ["newcmd = newpkg.main:registry"]},
+    # more arguments
 )
 ```
 
@@ -117,7 +116,6 @@ Now you have command `newcmd`:
     - fmt
     - ini
     - yml
-    ...
 
 Run with sub-command `fmt`:
 
