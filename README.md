@@ -88,7 +88,6 @@ Sub-command registry in `newpkg/newpkg/main.py`:
 import volkanic
 
 entries = {
-    # shorthand for "newpkg.formatter:run": "fmt",
     "newpkg.formatter": "fmt",
     "newpkg.parsers:run_yml_parser": "yml",
     "newpkg.parsers:run_ini_parser": "ini",
@@ -107,7 +106,7 @@ from setuptools import setup
 setup(
     name="newpkg",
     entry_points={"console_scripts": ["newcmd = newpkg.main:registry"]},
-    # more arguments
+    # more arguments here
 )
 ```
 
