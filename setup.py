@@ -46,9 +46,7 @@ config = {
     'license': "GNU General Public License (GPL)",
     'packages': find_packages(exclude=['test_*']),
     'zip_safe': False,
-    'entry_points': {
-        'console_scripts': ['volk=volkanic.default:registry'],
-    },
+    'entry_points': {'console_scripts': ['volk=volkanic.default:registry']},
     'install_requires': read("requirements.txt"),
     'classifiers': [
         'Programming Language :: Python',
@@ -66,6 +64,8 @@ config = {
 
     # ensure copy static file to runtime directory
     'include_package_data': True,
+    'long_description': read('README.md'),
+    'long_description_content_type': "text/markdown",
 }
 
 setup(**config)

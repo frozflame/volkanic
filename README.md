@@ -64,7 +64,9 @@ In one of your functional modules, e.g. `newpkg/newpkg/formatter.py`,
 provide a entry function which takes exactly 2 arguments:
 
 
-```python3
+```python
+import argparse
+
 def format_text(path):
     # actual code here
     return
@@ -94,11 +96,14 @@ entries = {
 registry = volkanic.CommandRegistry(entries)
 ```
 
+Note that `newpkg.formatter` is a shorthand for `newpkg.formatter:run`.
 
 
 Configure top-command in `newpkg/setup.py`:
 
 ```python
+from setuptools import setup
+
 setup(
     name="newpkg",
     entry_points={"console_scripts": ["newcmd = newpkg.main:registry"]},

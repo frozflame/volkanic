@@ -20,7 +20,7 @@ def _macos_open(path):
 
 
 def _windows_open(path):
-    os.startfile(path)
+    getattr(os, 'startfile')(path)
 
 
 def desktop_open(*paths):
@@ -62,6 +62,7 @@ def run_argv_debug(prog, _):
 
 
 def run_desktop_open(_, args):
+    args = args or ('.',)
     desktop_open(*args)
 
 
