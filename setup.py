@@ -15,8 +15,8 @@ description = 'a simple command runner'
 
 
 def read(filename):
-    with open(filename) as f:
-        return f.read()
+    with open(filename, encoding='utf-8') as fin:
+        return fin.read()
 
 
 def version_find():
