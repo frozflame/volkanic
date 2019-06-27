@@ -59,7 +59,7 @@ class CommandConf(object):
         if ext not in ['.yml', '.yaml']:
             name += '.yml'
         path = cls._locate(name, default_dir)
-        return cls(yaml.load(open(path)))
+        return cls(yaml.safe_load(open(path)))
 
     @classmethod
     def from_json(cls, name, default_dir=None):
