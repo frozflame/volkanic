@@ -122,10 +122,11 @@ class CommandRegistry(object):
         self.entries = entries
         self.commands = {v: k for k, v in entries.items()}
 
-    def show_commands(self):
-        print('availabe commands:')
+    def show_commands(self, prog=''):
+        print('AVAILABLE COMMANDS:')
         for cmd in sorted(self.commands):
-            print('-', cmd)
+            s = ' '.join([prog, cmd])
+            print(' ', s)
 
     def __call__(self, argv=None):
         if argv is None:
@@ -133,14 +134,15 @@ class CommandRegistry(object):
         else:
             argv = list(argv)
 
+        real_prog = os.path.basename(argv[0])
         try:
             dotpath = self.commands[argv[1]]
         except LookupError:
-            self.show_commands()
+            self.show_commands(real_prog)
             sys.exit(1)
 
         # intended use: argparse.ArgumentParser(prog=prog)
-        prog = '{} {}'.format(os.path.basename(argv[0]), argv[1])
+        prog = '{} {}'.format(real_prog, argv[1])
 
         if ':' not in dotpath:
             dotpath += ':run'
