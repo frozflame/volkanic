@@ -123,10 +123,11 @@ class CommandRegistry(object):
         self.commands = {v: k for k, v in entries.items()}
 
     def show_commands(self, prog=''):
-        print('AVAILABLE COMMANDS:')
+        indent = ' ' * 4
+        lines = ['available commands:', '']
         for cmd in sorted(self.commands):
-            s = ' '.join([prog, cmd])
-            print(' ', s)
+            lines.append(indent + ' '.join([prog, cmd]))
+        print(*lines, sep='\n', end='\n\n')
 
     def __call__(self, argv=None):
         if argv is None:
