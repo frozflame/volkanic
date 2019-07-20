@@ -5,6 +5,7 @@ from __future__ import unicode_literals, print_function
 
 import importlib
 import os
+import sys
 
 import volkanic
 
@@ -45,7 +46,20 @@ def where(name):
     return path
 
 
+def where_site_packages():
+    for name in ['pip', 'easy_install']:
+        try:
+            return os.path.split(where(name))[0]
+        except ModuleNotFoundError:
+            continue
+    for p in sys.path:
+        if p.endswith('site-packages'):
+            return p
+
+
 def run_where(_, args):
+    if not args:
+        return print(where_site_packages() or '')
     for arg in args:
         try:
             path = where(arg)
