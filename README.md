@@ -67,7 +67,7 @@ provide a entry function which takes exactly 2 arguments:
 ```python
 import argparse
 
-def format_text(path):
+def process_file(path):
     # actual code here
     return
 
@@ -77,7 +77,7 @@ def run(prog=None, args=None):
     parser = argparse.ArgumentParser(prog=prog, description=desc)
     parser.add_argument('-i', '--input-file', help='path to your input file')
     ns = parser.parse_args(args)
-    format_text(ns.input_file)
+    process_file(ns.input_file)
 ```
 
 
