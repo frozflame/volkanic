@@ -28,7 +28,7 @@ def load_variables(*contexts):
     scope = {}
     for ctx in contexts:
         if not isinstance(ctx, dict):
-            ctx = {re.split('[.:]', x)[-1]: x for x in ctx}
+            ctx = {re.split(r'[.:]', x)[-1]: x for x in ctx}
         for key, val in ctx.items():
             scope[key] = load_symbol(val)
     return scope
@@ -118,9 +118,11 @@ class CommandConf(object):
 
 
 class CommandRegistry(object):
-    def __init__(self, entries):
-        self.entries = entries
-        self.commands = {v: k for k, v in entries.items()}
+    def __init__(self, entries, invert=True):
+        if invert:
+            self.commands = {v: k for k, v in entries.items()}
+        else:
+            self.commands = entries
 
     def show_commands(self, prog=''):
         indent = ' ' * 4
