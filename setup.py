@@ -46,7 +46,7 @@ config = {
     'license': "GNU General Public License (GPL)",
     'packages': find_packages(exclude=['test_*']),
     'zip_safe': False,
-    'entry_points': {'console_scripts': ['volk=volkanic.default:registry']},
+    'entry_points': {'console_scripts': ['volk = volkanic.default:registry']},
     'install_requires': read("requirements.txt"),
     'classifiers': [
         'Programming Language :: Python',
