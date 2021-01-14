@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import copy
+import importlib
+import logging
 import os
 from functools import cached_property
-import re
-import logging
 
 import yaml
-
 
 logger = logging.getLogger(__name__)
 
@@ -61,11 +59,15 @@ class GlobalInterface(Singleton):
             if os.path.exists(path):
                 return path
 
+    @staticmethod
+    def _parse_conf(path: str):
+        return yaml.safe_load(open(path))
+
     @cached_property
     def conf(self) -> dict:
         path = self._locate_conf()
         if path:
-            user_config = yaml.safe_load(open(path))
+            user_config = self._parse_conf(path)
             logger.info('GlobalInterface.conf, path %s', path)
         else:
             user_config = {}
@@ -93,6 +95,7 @@ class GlobalInterface(Singleton):
 
     @cached_property
     def jinja2_env(self):
+        # noinspection PyPackageRequirements
         from jinja2 import Environment, PackageLoader, select_autoescape
         return Environment(
             loader=PackageLoader(self.package_name, 'templates'),
