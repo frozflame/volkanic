@@ -70,6 +70,15 @@ class CommandConf(object):
         path = cls._locate(name, default_dir)
         return cls(json.load(open(path)))
 
+    @classmethod
+    def from_json5(cls, name, default_dir=None):
+        import json5
+        ext = os.path.splitext(name)[1].lower()
+        if ext != '.json5':
+            name += '.json5'
+        path = cls._locate(name, default_dir)
+        return cls(json.load(open(path)))
+
     @staticmethod
     def _locate(path, default_dir):
         paths = [path]
