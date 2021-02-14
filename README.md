@@ -50,11 +50,11 @@ Say you have a package named `newpkg`
     ├── MANIFEST.in
     ├── docs
     ├── newpkg
-    │   ├── __init__.py
-    │   ├── algors.py
-    │   ├── formatters.py
-    │   ├── main.py
-    │   └── parsers.py
+    │    ├── __init__.py
+    │    ├── algors.py
+    │    ├── formatters.py
+    │    ├── main.py
+    │    └── parsers.py
     ├── requirements.txt
     ├── setup.py
     └── test_newpkg
@@ -87,12 +87,12 @@ Sub-command registry in `newpkg/newpkg/main.py`:
 ```python
 import volkanic
 
-entries = {
-    "newpkg.formatter": "fmt",
-    "newpkg.parsers:run_yml_parser": "yml",
-    "newpkg.parsers:run_ini_parser": "ini",
+commands = {
+    "fmt": "newpkg.formatter",
+    "yml": "newpkg.parsers:run_yml_parser",
+    "ini": "newpkg.parsers:run_ini_parser",
 }
-registry = volkanic.CommandRegistry(entries)
+registry = volkanic.CommandRegistry(commands)
 ```
 
 Note that `newpkg.formatter` is a shorthand for `newpkg.formatter:run`.
