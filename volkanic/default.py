@@ -82,7 +82,7 @@ def run_desktop_open(_, args):
 
 run_command_conf = volkanic.CommandConf.run
 
-registry = volkanic.CommandRegistry({
+registry = volkanic.CommandRegistry.from_entries({
     'volkanic.default:run_where': 'where',
     'volkanic.default:run_argv_debug': 'a',
     'volkanic.default:run_desktop_open': 'o',

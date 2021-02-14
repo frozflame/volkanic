@@ -53,31 +53,27 @@ class CommandConf(object):
         self.commands.setdefault('_global', {})
 
     @classmethod
+    def _from_file(cls, name, loader, default_dir=None):
+        path = cls._locate(name, default_dir)
+        return cls(loader(open(path)))
+
+    @classmethod
     def from_yaml(cls, name, default_dir=None):
         import yaml
         ext = os.path.splitext(name)[1].lower()
         if ext not in ['.yml', '.yaml']:
             name += '.yml'
-        path = cls._locate(name, default_dir)
-        return cls(yaml.safe_load(open(path)))
+        return cls._from_file(name, yaml.safe_load, default_dir)
 
     @classmethod
     def from_json(cls, name, default_dir=None):
         import json
-        ext = os.path.splitext(name)[1].lower()
-        if ext != '.json':
-            name += '.json'
-        path = cls._locate(name, default_dir)
-        return cls(json.load(open(path)))
+        return cls._from_file(name, json.load, default_dir)
 
     @classmethod
     def from_json5(cls, name, default_dir=None):
         import json5
-        ext = os.path.splitext(name)[1].lower()
-        if ext != '.json5':
-            name += '.json5'
-        path = cls._locate(name, default_dir)
-        return cls(json5.load(open(path)))
+        return cls._from_file(name, json5.load, default_dir)
 
     @staticmethod
     def _locate(path, default_dir):
