@@ -77,7 +77,7 @@ class CommandConf(object):
         if ext != '.json5':
             name += '.json5'
         path = cls._locate(name, default_dir)
-        return cls(json.load(open(path)))
+        return cls(json5.load(open(path)))
 
     @staticmethod
     def _locate(path, default_dir):
@@ -127,11 +127,24 @@ class CommandConf(object):
 
 
 class CommandRegistry(object):
-    def __init__(self, entries, invert=True):
-        if invert:
-            self.commands = {v: k for k, v in entries.items()}
-        else:
-            self.commands = entries
+    def __init__(self, commands):
+        self.commands = commands
+
+    @classmethod
+    def from_cmddef(cls, cmddef):
+        commands = {}
+        for line in cmddef.splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            cmd, dotpath = line.split()[:2]
+            commands[cmd] = dotpath
+        return cls(commands)
+
+    @classmethod
+    def from_entries(cls, entries):
+        return cls({v: k for k, v in entries.items()})
+
 
     def show_commands(self, prog=''):
         indent = ' ' * 4
