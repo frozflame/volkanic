@@ -35,7 +35,7 @@ class GlobalInterface(Singleton):
     package_name = 'volkanic'
 
     meta_config = {
-        'src_depth': 1,
+        'src_depth': 0,
         'filename': 'config.json5',
     }
 
@@ -62,7 +62,7 @@ class GlobalInterface(Singleton):
             os.path.expanduser('~/.{}/{}'),
         ]
         paths = [p.format(cls.primary_name, filename) for p in tmpls]
-        paths += [cls.under_project_dir()]
+        paths += [cls.under_project_dir(filename)]
         return paths
 
     @classmethod
@@ -88,8 +88,8 @@ class GlobalInterface(Singleton):
     def conf(self) -> dict:
         path = self._locate_conf()
         if path:
-            user_config = self._parse_conf(path)
             print('GlobalInterface.conf, path', path, file=sys.stderr)
+            user_config = self._parse_conf(path)
         else:
             user_config = {}
         config = dict(self.default_config)
@@ -116,7 +116,7 @@ class GlobalInterface(Singleton):
 
     @classmethod
     def under_project_dir(cls, *paths):
-        n = cls.meta_config.get('src_depth', 1)
+        n = cls.meta_config.get('src_depth', 0)
         n += len(cls.package_name.split())
         paths = ['..'] * n + list(paths)
         return cls.under_package_dir(*paths)
