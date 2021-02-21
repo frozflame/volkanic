@@ -5,9 +5,10 @@ import importlib
 import logging
 import os
 import sys
-from functools import cached_property
 
 import json5
+
+from volkanic.compat import cached_property
 
 logger = logging.getLogger(__name__)
 
@@ -34,12 +35,11 @@ class GlobalInterface(Singleton):
     # for package dir, [a-z.]+
     package_name = 'volkanic'
 
-    meta_config = {
-        'src_depth': 0,
-        'filename': 'config.json5',
-    }
+    # for project dir locating (under_project_dir())
+    project_source_depth = 0
 
     # default config and log format
+    default_config_filename = 'config.json5'
     default_config = {}
     default_logfmt = \
         '%(asctime)s %(levelname)s [%(process)s,%(thread)s] %(name)s %(message)s'
@@ -53,7 +53,7 @@ class GlobalInterface(Singleton):
         """
         Make sure this method can be called without arguments.
         """
-        filename = cls.meta_config['filename']
+        filename = cls.default_config_filename
         tmpls = [
             '/etc/{}/{}',
             '/{}/{}',
@@ -116,8 +116,9 @@ class GlobalInterface(Singleton):
 
     @classmethod
     def under_project_dir(cls, *paths):
-        n = cls.meta_config.get('src_depth', 0)
-        n += len(cls.package_name.split())
+        n = cls.project_source_depth
+        n += len(cls.package_name.split('.'))
+        print('n', n)
         paths = ['..'] * n + list(paths)
         return cls.under_package_dir(*paths)
 
