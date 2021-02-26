@@ -39,7 +39,6 @@ class GlobalInterface(Singleton):
     project_source_depth = 0
 
     # default config and log format
-    default_config_filename = 'config.json5'
     default_config = {}
     default_logfmt = \
         '%(asctime)s %(levelname)s [%(process)s,%(thread)s] %(name)s %(message)s'
@@ -53,28 +52,22 @@ class GlobalInterface(Singleton):
         """
         Make sure this method can be called without arguments.
         """
-        filename = cls.default_config_filename
-        tmpls = [
-            '/etc/{}/{}',
-            '/{}/{}',
-            '/data/local/{}/{}',
-            '/data/{}/{}',
-            os.path.expanduser('~/.{}/{}'),
+        envvar_name = cls._fmt_envvar_name('confpath')
+        try:
+            search_paths = [os.environ[envvar_name]]
+        except KeyError:
+            search_paths = []
+        search_paths += [
+            cls.under_project_dir('config.json5'),
+            cls.under_home_dir('.{}/config.json5'.format(cls.primary_name)),
         ]
-        paths = [p.format(cls.primary_name, filename) for p in tmpls]
-        paths += [cls.under_project_dir(filename)]
-        return paths
+        return search_paths
 
     @classmethod
     def _locate_conf(cls):
         """
         Returns: (str) absolute path to config file
         """
-        envvar_name = cls._fmt_envvar_name('confpath')
-        try:
-            return os.environ[envvar_name]
-        except KeyError:
-            pass
         for path in cls._get_conf_search_paths():
             path = os.path.abspath(path)
             if os.path.exists(path):
@@ -96,10 +89,13 @@ class GlobalInterface(Singleton):
         config.update(user_config)
         return config
 
-    def under_data_dir(self, *paths) -> str:
-        dirpath = self.conf['data_dir']
-        path = os.path.join(dirpath, *paths)
-        return os.path.abspath(path)
+    @staticmethod
+    def under_home_dir(*paths):
+        if sys.platform == 'win32':
+            homedir = os.environ["HOMEPATH"]
+        else:
+            homedir = os.path.expanduser('~')
+        return os.path.join(homedir, *paths)
 
     @classmethod
     def under_package_dir(cls, *paths) -> str:
@@ -109,11 +105,7 @@ class GlobalInterface(Singleton):
             return pkg_dir
         path = os.path.join(pkg_dir, *paths)
         return os.path.abspath(path)
-
-    def under_resources_dir(self, *paths):
-        dirpath = self.conf['resources_dir']
-        return os.path.join(dirpath, *paths)
-
+    
     @classmethod
     def under_project_dir(cls, *paths):
         n = cls.project_source_depth
