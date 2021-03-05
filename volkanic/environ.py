@@ -17,10 +17,16 @@ class Singleton(object):
     registered_instances = {}
 
     def __new__(cls, *args, **kwargs):
-        if cls not in cls.registered_instances:
+        try:
+            return cls.registered_instances[cls]
+        except KeyError:
             obj = super(Singleton, cls).__new__(cls, *args, **kwargs)
             cls.registered_instances[cls] = obj
-        return cls.registered_instances[cls]
+            return obj
+
+
+class WeakSingleton(object):
+    registered_instances = weakref.WeakValueDictionary()
 
 
 def _path_join(*paths):
@@ -110,7 +116,6 @@ class GlobalInterface(Singleton):
     def under_project_dir(cls, *paths):
         n = cls.project_source_depth
         n += len(cls.package_name.split('.'))
-        print('n', n)
         paths = ['..'] * n + list(paths)
         return cls.under_package_dir(*paths)
 

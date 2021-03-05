@@ -141,7 +141,6 @@ class CommandRegistry(object):
     def from_entries(cls, entries):
         return cls({v: k for k, v in entries.items()})
 
-
     def show_commands(self, prog=''):
         indent = ' ' * 4
         lines = ['available commands:', '']
