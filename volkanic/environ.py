@@ -4,6 +4,7 @@
 import importlib
 import logging
 import os
+import re
 import sys
 import weakref
 
@@ -30,7 +31,7 @@ class WeakSingleton(object):
     registered_instances = weakref.WeakValueDictionary()
 
 
-def _path_join(*paths):
+def _abs_path_join(*paths):
     path = os.path.join(*paths)
     return os.path.abspath(path)
 
@@ -60,15 +61,12 @@ class GlobalInterface(Singleton):
         Make sure this method can be called without arguments.
         """
         envvar_name = cls._fmt_envvar_name('confpath')
-        try:
-            search_paths = [os.environ[envvar_name]]
-        except KeyError:
-            search_paths = []
-        search_paths += [
+        return [
+            os.environ.get(envvar_name),
             cls.under_project_dir('config.json5'),
             cls.under_home_dir('.{}/config.json5'.format(cls.primary_name)),
+            '/etc/{}/config.json5'.format(cls.primary_name),
         ]
-        return search_paths
 
     @classmethod
     def _locate_conf(cls):
@@ -76,9 +74,10 @@ class GlobalInterface(Singleton):
         Returns: (str) absolute path to config file
         """
         for path in cls._get_conf_search_paths():
-            path = os.path.abspath(path)
+            if not path:
+                continue
             if os.path.exists(path):
-                return path
+                return os.path.abspath(path)
 
     @staticmethod
     def _parse_conf(path: str):
@@ -102,7 +101,7 @@ class GlobalInterface(Singleton):
             homedir = os.environ["HOMEPATH"]
         else:
             homedir = os.path.expanduser('~')
-        return os.path.join(homedir, *paths)
+        return _abs_path_join(homedir, *paths)
 
     @classmethod
     def under_package_dir(cls, *paths) -> str:
@@ -110,15 +109,17 @@ class GlobalInterface(Singleton):
         pkg_dir = os.path.split(mod.__file__)[0]
         if not paths:
             return pkg_dir
-        path = os.path.join(pkg_dir, *paths)
-        return os.path.abspath(path)
-    
+        return _abs_path_join(pkg_dir, *paths)
+
     @classmethod
     def under_project_dir(cls, *paths):
+        pkg_dir = cls.under_package_dir()
+        if re.search(r'[/\\](site|dist)-packages[/\\]', pkg_dir):
+            return
         n = cls.project_source_depth
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
-        return cls.under_package_dir(*paths)
+        return os.path.join(pkg_dir, *paths)
 
     @cached_property
     def jinja2_env(self):
