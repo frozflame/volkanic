@@ -123,8 +123,9 @@ class CommandConf(object):
 
 
 class CommandRegistry(object):
-    def __init__(self, commands):
+    def __init__(self, commands, prog='<prog>'):
         self.commands = commands
+        self.default_prog = prog
 
     @classmethod
     def from_cmddef(cls, cmddef):
@@ -141,20 +142,22 @@ class CommandRegistry(object):
     def from_entries(cls, entries):
         return cls({v: k for k, v in entries.items()})
 
-    def show_commands(self, prog=''):
+    def show_commands(self, prog):
         indent = ' ' * 4
         lines = ['available commands:', '']
         for cmd in sorted(self.commands):
             lines.append(indent + ' '.join([prog, cmd]))
         print(*lines, sep='\n', end='\n\n')
 
-    def __call__(self, argv=None):
-        if argv is None:
-            argv = sys.argv
-        else:
-            argv = list(argv)
+    def get_real_prog(self, argv):
+        prog = os.path.basename(argv[0])
+        if prog == '__main__.py':
+            return self.default_prog
+        return prog
 
-        real_prog = os.path.basename(argv[0])
+    def __call__(self, argv=None):
+        argv = sys.argv if argv is None else list(argv)
+        real_prog = self.get_real_prog(argv)
         try:
             dotpath = self.commands[argv[1]]
         except LookupError:
