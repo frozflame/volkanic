@@ -49,6 +49,9 @@ def _abs_path_join(*paths):
 class _GIMeta(SingletonMeta):
     def __new__(mcs, name, bases, attrs):
         pn = attrs.get('package_name')
+        if not isinstance(pn, str):
+            msg = '{}.package_name is of wrong type'.format(name)
+            raise TypeError(msg)
         if not pn:
             msg = '{}.package_name is missing'.format(name)
             raise ValueError(msg)
@@ -58,9 +61,27 @@ class _GIMeta(SingletonMeta):
         return super().__new__(mcs, name, bases, attrs)
 
 
+class _DerivedName:
+    __slots__ = ['_replacement']
+
+    def __init__(self, replacement):
+        self._replacement = replacement
+
+    def __get__(self, _, owner):
+        return owner.package_name.replace('.', self._replacement)
+
+
 class GlobalInterface(metaclass=_GIMeta):
-    # for package dir, [a-z.]+
+    # python dot-deliminated path, [a-z.]+
     package_name = 'volkanic'
+
+    # for path and url
+    # dot '.' in package_name replaced by hyphen '-'
+    project_name = _DerivedName('-')
+
+    # for symbols in code
+    # dot '.' in package_name replaced by underscore '_'
+    identifier = _DerivedName('_')
 
     # for project dir locating (under_project_dir())
     project_source_depth = 0
@@ -69,15 +90,6 @@ class GlobalInterface(metaclass=_GIMeta):
     default_config = {}
     default_logfmt = \
         '%(asctime)s %(levelname)s [%(process)s,%(thread)s] %(name)s %(message)s'
-
-    @cached_property
-    def project_name(self):
-        return self.package_name.replace('.', '-')
-
-    @cached_property
-    def identifier(self):
-        # for envvar prefix and default conf paths, [a-z]+
-        return self.package_name.replace('.', '_')
 
     @classmethod
     def _fmt_envvar_name(cls, name):
