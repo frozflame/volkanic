@@ -23,12 +23,22 @@ class Singleton(object):
             return cls.registered_instances[cls]
         except KeyError:
             obj = super(Singleton, cls).__new__(cls, *args, **kwargs)
-            cls.registered_instances[cls] = obj
-            return obj
+            return cls.registered_instances.setdefault(cls, obj)
 
 
 class WeakSingleton(object):
     registered_instances = weakref.WeakValueDictionary()
+
+
+class SingletonMeta(type):
+    registered_instances = {}
+
+    def __call__(cls, *args, **kwargs):
+        try:
+            return cls.registered_instances[cls]
+        except KeyError:
+            obj = super().__call__(*args, **kwargs)
+            return cls.registered_instances.setdefault(cls, obj)
 
 
 def _abs_path_join(*paths):
@@ -36,10 +46,19 @@ def _abs_path_join(*paths):
     return os.path.abspath(path)
 
 
-class GlobalInterface(Singleton):
-    # for envvar prefix and default conf paths, [a-z]+
-    primary_name = 'volcanic'
+class _GIMeta(SingletonMeta):
+    def __new__(mcs, name, bases, attrs):
+        pn = attrs.get('package_name')
+        if not pn:
+            msg = '{}.package_name is missing'.format(name)
+            raise ValueError(msg)
+        if not re.match(r'\w[\w.]*\w', pn):
+            msg = 'invalid {}.package_name: "{}"'.format(name, pn)
+            raise ValueError(msg)
+        return super().__new__(mcs, name, bases, attrs)
 
+
+class GlobalInterface(metaclass=_GIMeta):
     # for package dir, [a-z.]+
     package_name = 'volkanic'
 
@@ -51,21 +70,32 @@ class GlobalInterface(Singleton):
     default_logfmt = \
         '%(asctime)s %(levelname)s [%(process)s,%(thread)s] %(name)s %(message)s'
 
+    @cached_property
+    def project_name(self):
+        return self.package_name.replace('.', '-')
+
+    @cached_property
+    def identifier(self):
+        # for envvar prefix and default conf paths, [a-z]+
+        return self.package_name.replace('.', '_')
+
     @classmethod
     def _fmt_envvar_name(cls, name):
-        return '{}_{}'.format(cls.primary_name, name).upper()
+        return '{}_{}'.format(cls.identifier, name).upper()
 
     @classmethod
     def _get_conf_search_paths(cls):
         """
         Make sure this method can be called without arguments.
+        Override this method in your subclasses for your specific project.
         """
         envvar_name = cls._fmt_envvar_name('confpath')
+        pn = cls.project_name
         return [
             os.environ.get(envvar_name),
             cls.under_project_dir('config.json5'),
-            cls.under_home_dir('.{}/config.json5'.format(cls.primary_name)),
-            '/etc/{}/config.json5'.format(cls.primary_name),
+            cls.under_home_dir('.{}/config.json5'.format(pn)),
+            '/etc/{}/config.json5'.format(pn),
         ]
 
     @classmethod
@@ -87,7 +117,8 @@ class GlobalInterface(Singleton):
     def conf(self) -> dict:
         path = self._locate_conf()
         if path:
-            print('GlobalInterface.conf, path', path, file=sys.stderr)
+            msg = '{}.conf, path'.format(self.__class__.__name__)
+            print(msg, path, file=sys.stderr)
             user_config = self._parse_conf(path)
         else:
             user_config = {}
