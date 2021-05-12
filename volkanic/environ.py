@@ -162,7 +162,7 @@ class GlobalInterface(metaclass=_GIMeta):
         n = cls.project_source_depth
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
-        return os.path.join(pkg_dir, *paths)
+        return _abs_path_join(pkg_dir, *paths)
 
     @cached_property
     def jinja2_env(self):
