@@ -61,7 +61,7 @@ class _GIMeta(SingletonMeta):
         return super().__new__(mcs, name, bases, attrs)
 
 
-class _DerivedName:
+class _PackageNameDerivant:
     __slots__ = ['_replacement']
 
     def __init__(self, replacement):
@@ -77,11 +77,11 @@ class GlobalInterface(metaclass=_GIMeta):
 
     # for path and url
     # dot '.' in package_name replaced by hyphen '-'
-    project_name = _DerivedName('-')
+    project_name = _PackageNameDerivant('-')
 
     # for symbols in code
     # dot '.' in package_name replaced by underscore '_'
-    identifier = _DerivedName('_')
+    identifier = _PackageNameDerivant('_')
 
     # for project dir locating (under_project_dir())
     project_source_depth = 0
@@ -108,6 +108,7 @@ class GlobalInterface(metaclass=_GIMeta):
             cls.under_project_dir('config.json5'),
             cls.under_home_dir('.{}/config.json5'.format(pn)),
             '/etc/{}/config.json5'.format(pn),
+            '/{}/config.json5'.format(pn),
         ]
 
     @classmethod
