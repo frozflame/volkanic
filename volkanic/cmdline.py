@@ -3,8 +3,62 @@
 
 import os
 import sys
+from collections import OrderedDict
 
 from volkanic.utils import load_symbol
+
+
+# experimental
+class CommandOptionDict(OrderedDict):
+    def __init__(self, *args, **kwargs):
+        super(CommandOptionDict, self).__init__(*args, **kwargs)
+        self.pargs = []
+        self.executable = 'echo'
+
+    @classmethod
+    def _tuple_expand(cls, source_pairs, target_pairs: list):
+        """expand nested tuples -- recursively"""
+        for key, val in source_pairs:
+            if not isinstance(val, tuple):
+                target_pairs.append((key, val))
+                continue
+            # when val is of type tuple
+            pairs = [(key, v) for v in val]
+            cls._tuple_expand(pairs, target_pairs)
+
+    def as_args(self):
+        pairs = []
+        parts = [self.executable]
+        self._tuple_expand(self.items(), pairs)
+        for key, val in pairs:
+            if val is None or val is False:
+                pass
+            elif val is True:
+                parts.append(key)
+            elif isinstance(val, list):
+                parts.extend(val)
+            else:
+                parts.append(str(val))
+        parts.extend(self.pargs)
+        return parts
+
+    def __str__(self):
+        import shlex
+        args = [shlex.quote(s) for s in self.as_args()]
+        return ' '.join(args)
+
+    def run(self, dry=False, quiet=False, **kwargs):
+        if not quiet:
+            print(self, file=sys.stderr)
+        if not dry:
+            import subprocess
+            return subprocess.run(self.as_args(), **kwargs)
+
+    def __call__(self, executable, *pargs):
+        # for convenience
+        self.executable = executable
+        self.pargs = list(pargs)
+        return self
 
 
 class CommandRegistry(object):
