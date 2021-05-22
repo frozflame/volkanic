@@ -7,7 +7,7 @@ import importlib
 import os
 import sys
 
-import volkanic
+import volkanic.cmdline
 
 
 def _linux_open(path):
@@ -82,9 +82,9 @@ def run_desktop_open(_, args):
 
 run_command_conf = volkanic.CommandConf.run
 
-registry = volkanic.CommandRegistry.from_entries({
-    'volkanic.default:run_where': 'where',
-    'volkanic.default:run_argv_debug': 'a',
-    'volkanic.default:run_desktop_open': 'o',
-    'volkanic.default:run_command_conf': 'runconf',
+registry = volkanic.cmdline.CommandRegistry.from_entries({
+    'volkanic.execute:run_where': 'where',
+    'volkanic.execute:run_argv_debug': 'a',
+    'volkanic.execute:run_desktop_open': 'o',
+    'volkanic.execute:run_command_conf': 'runconf',
 })
