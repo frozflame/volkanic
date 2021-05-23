@@ -8,10 +8,12 @@ import importlib
 import os
 
 from volkanic.utils import subattr, load_symbol, load_variables
+from volkanic.cmdline import CommandRegistry
 
 __compat_symbols = [
     load_symbol,
     load_variables,
+    CommandRegistry,
 ]
 
 

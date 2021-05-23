@@ -32,9 +32,10 @@ class CommandOptionDict(OrderedDict):
         self._tuple_expand(self.items(), pairs)
         for key, val in pairs:
             if val is None or val is False:
+                continue
+            parts.append(key)
+            if val is True:
                 pass
-            elif val is True:
-                parts.append(key)
             elif isinstance(val, list):
                 parts.extend(val)
             else:
