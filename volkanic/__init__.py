@@ -5,4 +5,6 @@ __version__ = '0.3.0!'
 
 from volkanic.cmdline import CommandRegistry
 from volkanic.environ import GlobalInterface
+
+# will be removed in 0.4.0
 from volkanic.system import CommandConf
