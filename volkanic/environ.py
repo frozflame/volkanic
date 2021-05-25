@@ -41,7 +41,7 @@ class SingletonMeta(type):
             return cls.registered_instances.setdefault(cls, obj)
 
 
-def _abs_path_join(*paths):
+def abs_path_join(*paths):
     path = os.path.join(*paths)
     return os.path.abspath(path)
 
@@ -129,12 +129,14 @@ class GlobalInterface(metaclass=_GIMeta):
     @cached_property
     def conf(self) -> dict:
         path = self._locate_conf()
+        cn = self.__class__.__name__
         if path:
-            msg = '{}.conf, path'.format(self.__class__.__name__)
-            print(msg, path, file=sys.stderr)
             user_config = self._parse_conf(path)
+            msg = '{}.conf, path'.format(cn)
         else:
             user_config = {}
+            msg = '{}.conf, hard-coded'.format(cn)
+        print(msg, path, file=sys.stderr)
         config = dict(self.default_config)
         config.update(user_config)
         return config
@@ -145,7 +147,7 @@ class GlobalInterface(metaclass=_GIMeta):
             homedir = os.environ["HOMEPATH"]
         else:
             homedir = os.path.expanduser('~')
-        return _abs_path_join(homedir, *paths)
+        return abs_path_join(homedir, *paths)
 
     @classmethod
     def under_package_dir(cls, *paths) -> str:
@@ -153,7 +155,7 @@ class GlobalInterface(metaclass=_GIMeta):
         pkg_dir = os.path.split(mod.__file__)[0]
         if not paths:
             return pkg_dir
-        return _abs_path_join(pkg_dir, *paths)
+        return abs_path_join(pkg_dir, *paths)
 
     @classmethod
     def under_project_dir(cls, *paths):
@@ -163,7 +165,7 @@ class GlobalInterface(metaclass=_GIMeta):
         n = cls.project_source_depth
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
-        return _abs_path_join(pkg_dir, *paths)
+        return abs_path_join(pkg_dir, *paths)
 
     @cached_property
     def jinja2_env(self):

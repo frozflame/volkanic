@@ -44,7 +44,7 @@ config = {
     'author': 'frozflame',
     'author_email': 'frozflame@outlook.com',
     'license': "GNU General Public License (GPL)",
-    'packages': find_packages(exclude=['test_*']),
+    'packages': find_packages(include=['volkanic.*']),
     'zip_safe': False,
     'entry_points': {'console_scripts': ['volk = volkanic.default:registry']},
     'install_requires': read("requirements.txt"),
