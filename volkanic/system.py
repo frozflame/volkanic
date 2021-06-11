@@ -7,7 +7,7 @@ import contextlib
 import importlib
 import os
 
-from volkanic.utils import getattrs, load_symbol, load_variables
+from volkanic.utils import query_attr, load_symbol, load_variables
 from volkanic.cmdline import CommandRegistry
 
 __compat_symbols = [
@@ -80,7 +80,7 @@ class CommandConf(object):
         if not isinstance(args, (list, tuple)):
             args = [args]
         m = importlib.import_module(module)
-        getattrs(m, *call.split('.'))(*args, **kwargs)
+        query_attr(m, *call.split('.'))(*args, **kwargs)
 
     def __call__(self, cmd):
         if cmd not in self.commands:
