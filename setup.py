@@ -9,9 +9,7 @@ from setuptools import setup, find_packages
 # import volkanic; exit(1)
 # DO NOT import your package from your setup.py
 
-
-package_name = 'volkanic'
-description = 'simplify conf and sub-cmd'
+description = 'auxiliary tools dealing with paths and config files'
 
 
 def read(filename):
@@ -19,9 +17,13 @@ def read(filename):
         return fin.read()
 
 
-def version_find():
-    root = os.path.dirname(__file__)
-    path = os.path.join(root, '{}/__init__.py'.format(package_name))
+def _under_parent_dir(ref_path, *paths):
+    parent_dir = os.path.dirname(ref_path)
+    return os.path.join(parent_dir, *paths)
+
+
+def find_version():
+    path = _under_parent_dir(__file__, 'volkanic/__init__.py')
     regex = re.compile(
         r'''^__version__\s*=\s*('|"|'{3}|"{3})([.\w]+)\1\s*(#|$)''')
     with open(path) as fin:
@@ -36,15 +38,15 @@ def version_find():
 
 
 config = {
-    'name': package_name,
-    'version': version_find(),
-    'description': '' + description,
+    'name': 'volkanic',
+    'version': find_version(),
+    'description': description,
     'keywords': '',
     'url': "https://github.com/frozflame/volkanic",
     'author': 'frozflame',
     'author_email': 'frozflame@outlook.com',
     'license': "GNU General Public License (GPL)",
-    'packages': find_packages(include=['volkanic.*']),
+    'packages': find_packages(include=['volkanic']),
     'zip_safe': False,
     'entry_points': {
         'console_scripts': ['volk = volkanic.__main__:registry']
