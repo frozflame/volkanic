@@ -5,20 +5,20 @@ import os
 import importlib
 
 
-def getattrs(obj, *names):
+def query_attr(obj, *names):
     for x in names:
         obj = getattr(obj, x)
     return obj
 
 
-subattr = getattrs
+subattr = query_attr
 
 
 def load_symbol(symbolpath):
     parts = symbolpath.split(':', 1)
     symbol = importlib.import_module(parts.pop(0))
     if parts:
-        symbol = getattrs(symbol, *parts[0].split('.'))
+        symbol = query_attr(symbol, *parts[0].split('.'))
     return symbol
 
 
