@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import os
 import importlib
+import os
+import sys
 
 
 def query_attr(obj, *names):
@@ -51,3 +52,50 @@ def abs_path_join_and_mkdirs(*paths):
     else:
         os.makedirs(os.path.split(path)[0], exist_ok=True)
     return path
+
+
+def _linux_open(path):
+    import subprocess
+    subprocess.run(['xdg-open', path])
+
+
+def _macos_open(path):
+    import subprocess
+    subprocess.run(['open', path])
+
+
+def _windows_open(path):
+    getattr(os, 'startfile')(path)
+
+
+def desktop_open(*paths):
+    import platform
+    osname = platform.system().lower()
+    if osname == 'darwin':
+        handler = _macos_open
+    elif osname == 'windows':
+        handler = _windows_open
+    else:
+        handler = _linux_open
+    for path in paths:
+        handler(path)
+
+
+def where(name):
+    mod = importlib.import_module(name)
+    path = getattr(mod, '__file__', 'NotAvailable')
+    dir_, filename = os.path.split(path)
+    if filename.startswith('__init__.'):
+        return dir_
+    return path
+
+
+def where_site_packages():
+    for name in ['pip', 'easy_install']:
+        try:
+            return os.path.split(where(name))[0]
+        except ModuleNotFoundError:
+            continue
+    for p in sys.path:
+        if p.endswith('site-packages'):
+            return p

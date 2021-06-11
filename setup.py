@@ -46,12 +46,13 @@ config = {
     'license': "GNU General Public License (GPL)",
     'packages': find_packages(include=['volkanic.*']),
     'zip_safe': False,
-    'entry_points': {'console_scripts': ['volk = volkanic.default:registry']},
+    'entry_points': {
+        'console_scripts': ['volk = volkanic.__main__:registry']
+    },
     'install_requires': read("requirements.txt"),
     'classifiers': [
         'Programming Language :: Python',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
