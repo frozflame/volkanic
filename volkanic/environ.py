@@ -11,6 +11,7 @@ import weakref
 import json5
 
 from volkanic.compat import cached_property
+from volkanic.utils import abs_path_join
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +40,6 @@ class SingletonMeta(type):
         except KeyError:
             obj = super().__call__(*args, **kwargs)
             return cls.registered_instances.setdefault(cls, obj)
-
-
-def abs_path_join(*paths):
-    path = os.path.join(*paths)
-    return os.path.abspath(path)
 
 
 class _GIMeta(SingletonMeta):
@@ -132,11 +128,10 @@ class GlobalInterface(metaclass=_GIMeta):
         cn = self.__class__.__name__
         if path:
             user_config = self._parse_conf(path)
-            msg = '{}.conf, path'.format(cn)
+            print('{}.conf, path'.format(cn), path, file=sys.stderr)
         else:
             user_config = {}
-            msg = '{}.conf, hard-coded'.format(cn)
-        print(msg, path, file=sys.stderr)
+            print('{}.conf, hard-coded'.format(cn), file=sys.stderr)
         config = dict(self.default_config)
         config.update(user_config)
         return config
