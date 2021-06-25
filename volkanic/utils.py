@@ -99,3 +99,20 @@ def where_site_packages():
     for p in sys.path:
         if p.endswith('site-packages'):
             return p
+
+
+def indented_json_dumps(obj, **kwargs):
+    import json
+    kwargs.setdefault('indent', 4)
+    kwargs.setdefault('default', str)
+    kwargs.setdefault('ensure_ascii', False)
+    return json.dumps(obj, **kwargs)
+
+
+def indented_json_print(obj, **kwargs):
+    print_kwargs = {}
+    print_keywords = ['sep', 'end', 'file', 'flush']
+    for key in print_keywords:
+        if key in kwargs:
+            print_kwargs[key] = kwargs.pop(key)
+    print(indented_json_dumps(obj, **kwargs), **print_kwargs)
