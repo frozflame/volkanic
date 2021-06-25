@@ -3,27 +3,17 @@
 
 from __future__ import unicode_literals
 
-import contextlib
 import importlib
 import os
 
+from volkanic.cmdline import CommandRegistry, remember_cwd
 from volkanic.utils import query_attr, load_symbol, load_variables
-from volkanic.cmdline import CommandRegistry
 
 __compat_symbols = [
     load_symbol,
     load_variables,
     CommandRegistry,
 ]
-
-
-@contextlib.contextmanager
-def remember_cwd():
-    curdir = os.getcwd()
-    try:
-        yield
-    finally:
-        os.chdir(curdir)
 
 
 class CommandNotFound(KeyError):
