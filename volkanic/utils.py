@@ -12,6 +12,13 @@ def query_attr(obj, *names):
     return obj
 
 
+def merge_dicts(*dicts):
+    retdic = {}
+    for dic in dicts:
+        retdic.update(dic)
+    return retdic
+
+
 subattr = query_attr
 
 

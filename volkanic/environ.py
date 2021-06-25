@@ -10,8 +10,8 @@ import weakref
 
 import json5
 
+from volkanic import utils
 from volkanic.compat import cached_property
-from volkanic.utils import abs_path_join
 
 logger = logging.getLogger(__name__)
 
@@ -127,14 +127,12 @@ class GlobalInterface(metaclass=_GIMeta):
         path = self._locate_conf()
         cn = self.__class__.__name__
         if path:
-            user_config = self._parse_conf(path)
+            config = self._parse_conf(path)
             print('{}.conf, path'.format(cn), path, file=sys.stderr)
         else:
-            user_config = {}
+            config = {}
             print('{}.conf, hard-coded'.format(cn), file=sys.stderr)
-        config = dict(self.default_config)
-        config.update(user_config)
-        return config
+        return utils.merge_dicts(self.default_config, config)
 
     @staticmethod
     def under_home_dir(*paths):
@@ -142,7 +140,7 @@ class GlobalInterface(metaclass=_GIMeta):
             homedir = os.environ["HOMEPATH"]
         else:
             homedir = os.path.expanduser('~')
-        return abs_path_join(homedir, *paths)
+        return utils.abs_path_join(homedir, *paths)
 
     @classmethod
     def under_package_dir(cls, *paths) -> str:
@@ -150,7 +148,7 @@ class GlobalInterface(metaclass=_GIMeta):
         pkg_dir = os.path.split(mod.__file__)[0]
         if not paths:
             return pkg_dir
-        return abs_path_join(pkg_dir, *paths)
+        return utils.abs_path_join(pkg_dir, *paths)
 
     @classmethod
     def under_project_dir(cls, *paths):
@@ -160,7 +158,7 @@ class GlobalInterface(metaclass=_GIMeta):
         n = cls.project_source_depth
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
-        return abs_path_join(pkg_dir, *paths)
+        return utils.abs_path_join(pkg_dir, *paths)
 
     @cached_property
     def jinja2_env(self):

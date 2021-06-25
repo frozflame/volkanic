@@ -1,11 +1,21 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import contextlib
 import os
 import sys
 from collections import OrderedDict
 
 from volkanic.utils import load_symbol
+
+
+@contextlib.contextmanager
+def remember_cwd():
+    curdir = os.getcwd()
+    try:
+        yield
+    finally:
+        os.chdir(curdir)
 
 
 # experimental
