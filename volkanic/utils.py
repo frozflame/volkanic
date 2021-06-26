@@ -67,6 +67,14 @@ def under_parent_dir(ref_path: str, *paths) -> str:
     return abs_path_join(parent_dir, *paths)
 
 
+def under_home_dir(*paths):
+    if sys.platform == 'win32':
+        homedir = os.environ["HOMEPATH"]
+    else:
+        homedir = os.path.expanduser('~')
+    return abs_path_join(homedir, *paths)
+
+
 def _linux_open(path):
     import subprocess
     subprocess.run(['xdg-open', path])
