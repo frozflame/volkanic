@@ -5,11 +5,38 @@ import copy
 import datetime
 import hashlib
 import itertools
+import os
+import re
 import string
 import sys
 import traceback
 
+import setuptools
+
 from volkanic.compat import cached_property
+
+
+def _to_dot_path(path: str):
+    path, ext = os.path.splitext(path)
+    if not ext == '.py':
+        return
+    parts = path.split(os.sep)
+    if len(parts) > 1 and parts[-1] == '__init__':
+        parts = parts[:-1]
+    regex = re.compile(r'[_A-Za-z][_A-Za-z0-9]*$')
+    for part in parts:
+        if not regex.match(part):
+            return
+    return '.'.join(parts)
+
+
+def find_all_plain_modules(search_dir: str):
+    for path in setuptools.findall(search_dir):
+        path = os.path.relpath(path, search_dir)
+        dotpath = _to_dot_path(path)
+        if not dotpath:
+            continue
+        yield dotpath
 
 
 def _trim_str(obj: str, limit: int):
