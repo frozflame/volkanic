@@ -136,11 +136,7 @@ class GlobalInterface(metaclass=_GIMeta):
 
     @staticmethod
     def under_home_dir(*paths):
-        if sys.platform == 'win32':
-            homedir = os.environ["HOMEPATH"]
-        else:
-            homedir = os.path.expanduser('~')
-        return utils.abs_path_join(homedir, *paths)
+        return utils.under_home_dir(*paths)
 
     @classmethod
     def under_package_dir(cls, *paths) -> str:
