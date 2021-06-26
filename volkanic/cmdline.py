@@ -10,12 +10,15 @@ from volkanic.utils import load_symbol
 
 
 @contextlib.contextmanager
-def remember_cwd():
-    curdir = os.getcwd()
+def remember_cwd(path=None):
+    """Temporarily change Current Working Directory (CWD/PWD)"""
+    prev_cwd = os.getcwd()
+    if path:
+        os.chdir(path)
     try:
         yield
     finally:
-        os.chdir(curdir)
+        os.chdir(prev_cwd)
 
 
 # experimental

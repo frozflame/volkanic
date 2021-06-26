@@ -94,5 +94,3 @@ class CommandConf(object):
         ns = parser.parse_args(args=args)
         cconf = cls.from_yaml(ns.name, default_dir)
         cconf(ns.key)
-
-
