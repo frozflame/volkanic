@@ -61,6 +61,12 @@ def abs_path_join_and_mkdirs(*paths):
     return path
 
 
+def under_parent_dir(ref_path: str, *paths) -> str:
+    ref_path = os.path.abspath(ref_path)
+    parent_dir = os.path.dirname(ref_path)
+    return abs_path_join(parent_dir, *paths)
+
+
 def _linux_open(path):
     import subprocess
     subprocess.run(['xdg-open', path])
