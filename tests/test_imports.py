@@ -9,7 +9,7 @@ from volkanic.introspect import find_all_plain_modules
 gi = GlobalInterface()
 
 
-def test_importability():
+def test_module_imports():
     for dotpath in find_all_plain_modules(gi.under_project_dir()):
         if dotpath.startswith('volkanic.'):
             print(dotpath)
@@ -17,4 +17,4 @@ def test_importability():
 
 
 if __name__ == '__main__':
-    test_importability()
+    test_module_imports()
