@@ -6,10 +6,21 @@ import os
 import sys
 
 
-def query_attr(obj, *names):
-    for x in names:
+def attr_query(obj, *attrnames):
+    for x in attrnames:
         obj = getattr(obj, x)
     return obj
+
+
+def attr_setdefault(obj, attrname, value):
+    try:
+        return getattr(obj, attrname)
+    except AttributeError:
+        setattr(obj, attrname, value)
+        return value
+
+
+query_attr = attr_query
 
 
 def merge_dicts(*dicts):
