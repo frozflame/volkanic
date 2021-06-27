@@ -92,7 +92,7 @@ class GlobalInterface(metaclass=_GIMeta):
         return '{}_{}'.format(cls.identifier, name).upper()
 
     @classmethod
-    def _get_conf_search_paths(cls):
+    def _get_conf_paths(cls):
         """
         Make sure this method can be called without arguments.
         Override this method in your subclasses for your specific project.
@@ -107,12 +107,18 @@ class GlobalInterface(metaclass=_GIMeta):
             '/{}/config.json5'.format(pn),
         ]
 
+    _get_conf_search_paths = _get_conf_paths
+
     @classmethod
     def _locate_conf(cls):
         """
         Returns: (str) absolute path to config file
         """
-        for path in cls._get_conf_search_paths():
+        if not hasattr(cls, '_get_conf_search_paths'):
+            paths = cls._get_conf_search_paths()
+        else:
+            paths = cls._get_conf_paths()
+        for path in paths:
             if not path:
                 continue
             if os.path.exists(path):
