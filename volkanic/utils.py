@@ -52,15 +52,19 @@ def load_variables(*contexts):
     return scope
 
 
-def abs_path_join(*paths):
+def _abs_path_join(*paths):
+    path = os.path.join(*paths)
+    return os.path.abspath(path)
+
+
+def abs_path_join(*paths) -> str:
     if not paths:
         msg = 'abs_path_join() requires at least 1 argument'
         raise TypeError(msg)
     if paths[0].startswith('~'):
         paths = list(paths)
         paths[0] = os.path.expanduser(paths[0])
-    path = os.path.join(*paths)
-    return os.path.abspath(path)
+    return _abs_path_join(*paths)
 
 
 def abs_path_join_and_mkdirs(*paths):
@@ -83,7 +87,14 @@ def under_home_dir(*paths):
         homedir = os.environ["HOMEPATH"]
     else:
         homedir = os.path.expanduser('~')
-    return abs_path_join(homedir, *paths)
+    return _abs_path_join(homedir, *paths)
+
+
+def under_package_dir(package, *paths):
+    if isinstance(package, str):
+        package = importlib.import_module(package)
+    pkg_dir = os.path.dirname(package.__file__)
+    return _abs_path_join(pkg_dir, *paths)
 
 
 def _linux_open(path):
