@@ -146,8 +146,7 @@ class GlobalInterface(metaclass=_GIMeta):
 
     @classmethod
     def under_package_dir(cls, *paths) -> str:
-        mod = importlib.import_module(cls.package_name)
-        return utils.under_parent_dir(mod.__file__, *paths)
+        return utils.under_package_dir(cls.package_name, *paths)
 
     @classmethod
     def under_project_dir(cls, *paths):
