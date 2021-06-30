@@ -4,6 +4,7 @@
 import copy
 import datetime
 import hashlib
+import inspect
 import itertools
 import os
 import re
@@ -14,6 +15,41 @@ import traceback
 import setuptools
 
 from volkanic.compat import cached_property
+
+
+def format_class_path(obj):
+    if isinstance(obj, type):
+        klass = obj
+    else:
+        klass = type(obj)
+    m = getattr(klass, '__module__', None)
+    q = getattr(klass, '__qualname__', None)
+    n = getattr(klass, '__name__', None)
+    name = q or n or ''
+    if m:
+        return '{}.{}'.format(m, name)
+    return name
+
+
+def _regular_attr_lookup(dictlike, *keys):
+    for key in keys:
+        try:
+            return getattr(dictlike, key)
+        except AttributeError:
+            pass
+
+
+def format_function_path(func):
+    if not inspect.ismethod(func):
+        mod = getattr(func, '__module__', None)
+        qualname = _regular_attr_lookup(func, '__qualname__', '__name__')
+        qualname = qualname or '<func>'
+        if mod is None:
+            return qualname
+        else:
+            return '{}.{}'.format(mod, qualname)
+    klass_path = format_class_path(func.__self__)
+    return '{}.{}'.format(klass_path, func.__name__)
 
 
 def _to_dot_path(path: str):
@@ -190,7 +226,6 @@ class ErrorInfo(object):
 
     @cached_property
     def debug_info(self, prefix=''):
-        import inspect
         tb = self.exc.__traceback__
         if tb is None:
             return
