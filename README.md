@@ -43,13 +43,13 @@ Show `sys.argv`:
 -------------------------------------------------------------------------
 ### Sub-command protocal
 
-Say you have a package named `newpkg`
+Say you have a package named `mypkg`
 
 
-    newpkg
+    mypkg/
     ├── MANIFEST.in
-    ├── docs
-    ├── newpkg
+    ├── docs/
+    ├── mypkg/
     │    ├── __init__.py
     │    ├── algors.py
     │    ├── formatters.py
@@ -57,10 +57,10 @@ Say you have a package named `newpkg`
     │    └── parsers.py
     ├── requirements.txt
     ├── setup.py
-    └── test_newpkg
+    └── tests/
 
 
-In one of your functional modules, e.g. `newpkg/newpkg/formatter.py`,
+In one of your functional modules, e.g. `mypkg/mypkg/formatter.py`,
 provide a entry function which takes exactly 2 arguments:
 
 
@@ -71,51 +71,51 @@ def process_file(path):
     # actual code here
     return
 
-
 def run(prog=None, args=None):
     desc = 'human readable formatter'
     parser = argparse.ArgumentParser(prog=prog, description=desc)
-    parser.add_argument('-i', '--input-file', help='path to your input file')
+    add = parser.add_argument
+    add('-i', '--input-file', help='path to your input file')
     ns = parser.parse_args(args)
     process_file(ns.input_file)
 ```
 
 
-Sub-command registry in `newpkg/newpkg/main.py`:
+Sub-command registry in `mypkg/mypkg/main.py`:
 
 
 ```python
 import volkanic
 
 commands = {
-    "fmt": "newpkg.formatter",
-    "yml": "newpkg.parsers:run_yml_parser",
-    "ini": "newpkg.parsers:run_ini_parser",
+    "fmt": "mypkg.formatter",
+    "yml": "mypkg.parsers:run_yml_parser",
+    "ini": "mypkg.parsers:run_ini_parser",
 }
 registry = volkanic.CommandRegistry(commands)
 ```
 
-Note that `newpkg.formatter` is a shorthand for `newpkg.formatter:run`.
+Note that `mypkg.formatter` is a shorthand for `mypkg.formatter:run`.
 
 
-Configure top-command in `newpkg/setup.py`:
+Configure top level command in `mypkg/setup.py`:
 
 ```python
 from setuptools import setup
 
 setup(
-    name="newpkg",
-    entry_points={"console_scripts": ["newcmd = newpkg.main:registry"]},
+    name="mypkg",
+    entry_points={"console_scripts": ["mycmd = mypkg.main:registry"]},
     # more arguments here
 )
 ```
 
 
-Install package `newpkg` or link with `python3 setup.py develop`.
+Install package `mypkg` or link with `python3 setup.py develop`.
 
-Now you have command `newcmd`:
+Now you have command `mycmd`:
 
-    $ newcmd
+    $ mycmd
     availabe commands:
     - fmt
     - ini
@@ -123,28 +123,5 @@ Now you have command `newcmd`:
 
 Run with sub-command `fmt`:
 
-    $ newcmd fmt -h
+    $ mycmd fmt -h
 
--------------------------------------------------------------------------
-### Run YAML
-
-Create a YAML file, e.g. `print.yml`
-
-```yaml
-default:
-    module: builtins
-    call: print
-    args:
-    - volkanic
-    - command
-    kwargs:
-        sep: "-"
-        end: "~"
- ```
-
-Run
-
-```bash
-$ volk runconf print.yml
-volkanic-command~
-```
