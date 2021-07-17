@@ -114,10 +114,10 @@ class GlobalInterface(metaclass=_GIMeta):
         """
         Returns: (str) absolute path to config file
         """
-        if not hasattr(cls, '_get_conf_search_paths'):
-            paths = cls._get_conf_search_paths()
-        else:
-            paths = cls._get_conf_paths()
+        func = getattr(cls, '_get_conf_search_paths', None)
+        if func is None:
+            func = cls._get_conf_paths
+        paths = func()
         for path in paths:
             if not path:
                 continue
