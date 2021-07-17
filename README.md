@@ -1,9 +1,75 @@
 volkanic
 ========
 
-A simple command runner. To install (add `sudo` if necessary)
+Auxiliary tools dealing with paths and config files. 
+
+To install (add `sudo` if necessary)
 
     python3 -m pip install volkanic
+
+
+### GlobalInterface and config file
+
+Example:
+
+`GlobalInterface` is defined in `example/environ.py` as:
+
+```python
+import volkanic
+
+
+class GlobalInterface(volkanic.GlobalInterface):
+    # you should always define `package_name`
+    package_name = 'example'
+```
+
+Configuration file `config.json5`:
+
+```json5
+{
+    "upstram_prefix": "http://127.0.0.1:9100",
+    "sqlite": "/data/local/example/db.sqlite"
+}
+```
+
+This `config.json5` is at one of the follow locations:
+- Under your project directory in a development enviornment
+- `~/.example/config.json5`
+- `/etc/example/config.json5`
+- `/example/config.json5`
+
+Access config:
+
+```
+>>> from example.environ import GlobalInterface 
+>>> gi = GlobalInterface()  # note that GlobalInterface is a singlon class
+>>> print(gi.conf)
+{'data_dir': '/data/local/example', 'sqlite': '/data/local/example/db.sqlite'}
+```
+
+Note that `GlobalInterface` is a singlon class, which means that 
+`GlobalInterface()` will always return the same object:
+```
+>>> GlobalInterface() is GlobalInterface()
+True
+```
+
+The recommended usage of `GlobalInterface()` is to create instanciate it 
+at the top each module:
+
+```python
+import re
+import math
+from example.tools import your_funny_tool  # noqa
+
+gi = GlobalInterface()
+
+
+def find_funny_things():
+    url = gi.conf['upstram_prefix'] + '/funny-api'
+    path = gi.under_package_dir('asset/funny.json')
+    # more code here ...
+```
 
 
 -------------------------------------------------------------------------
