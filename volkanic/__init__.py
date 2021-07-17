@@ -3,6 +3,9 @@
 
 __version__ = '0.3.3'
 
+if __name__ == '__main__':
+    print(__version__)
+
 from volkanic.cmdline import CommandRegistry
 from volkanic.environ import GlobalInterface
 
