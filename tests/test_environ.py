@@ -3,10 +3,12 @@
 
 import volkanic
 from volkanic import utils
+from volkanic.environ import GIMixinDirs
 
 
-class GlobalInterface(volkanic.GlobalInterface):
-    package_name = 'joker.example'
+class GlobalInterface(volkanic.GlobalInterface, GIMixinDirs):
+    default_config = {'data_dir': '/tmp1/data'}
+    package_name = 'os.path'
 
 
 volk_gi = volkanic.GlobalInterface()
@@ -29,9 +31,9 @@ def test_names():
     _eq(volkanic.GlobalInterface.package_name, 'volkanic')
     _eq(volkanic.GlobalInterface.project_name, 'volkanic')
     _eq(volkanic.GlobalInterface.identifier, 'volkanic')
-    _eq(GlobalInterface.package_name, 'joker.example')
-    _eq(GlobalInterface.project_name, 'joker-example')
-    _eq(GlobalInterface.identifier, 'joker_example')
+    _eq(GlobalInterface.package_name, 'os.path')
+    _eq(GlobalInterface.project_name, 'os-path')
+    _eq(GlobalInterface.identifier, 'os_path')
 
 
 def test_under_dir():
@@ -39,3 +41,5 @@ def test_under_dir():
         volk_gi.under_package_dir('a/b'))
     _eq(volk_gi.under_package_dir(),
         utils.under_parent_dir(volkanic.__file__))
+    _eq(test_gi.under_data_dir(),
+        '/tmp1/data')
