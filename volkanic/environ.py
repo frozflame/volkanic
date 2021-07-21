@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import importlib
+import abc
 import logging
 import os
 import re
@@ -11,24 +11,9 @@ import weakref
 import json5
 
 from volkanic import utils
-from volkanic.compat import cached_property
+from volkanic.compat import cached_property, abstract_property
 
 logger = logging.getLogger(__name__)
-
-
-class Singleton(object):
-    registered_instances = {}
-
-    def __new__(cls, *args, **kwargs):
-        try:
-            return cls.registered_instances[cls]
-        except KeyError:
-            obj = super(Singleton, cls).__new__(cls, *args, **kwargs)
-            return cls.registered_instances.setdefault(cls, obj)
-
-
-class WeakSingleton(object):
-    registered_instances = weakref.WeakValueDictionary()
 
 
 class SingletonMeta(type):
@@ -40,6 +25,18 @@ class SingletonMeta(type):
         except KeyError:
             obj = super().__call__(*args, **kwargs)
             return cls.registered_instances.setdefault(cls, obj)
+
+
+class WeakSingletonMeta(SingletonMeta):
+    registered_instances = weakref.WeakValueDictionary()
+
+
+class Singleton(metaclass=SingletonMeta):
+    pass
+
+
+class WeakSingleton(metaclass=WeakSingletonMeta):
+    pass
 
 
 class _GIMeta(SingletonMeta):
