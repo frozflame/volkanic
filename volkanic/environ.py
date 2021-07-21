@@ -171,3 +171,34 @@ class GlobalInterface(metaclass=_GIMeta):
             level = os.environ.get(envvar_name, 'DEBUG')
         fmt = fmt or cls.default_logfmt
         logging.basicConfig(level=level, format=fmt)
+
+
+class GIMixinDirs:
+    @abstract_property
+    def conf(self) -> dict:
+        return NotImplemented
+
+    @abc.abstractmethod
+    def under_project_dir(self, *paths) -> str:
+        return NotImplemented
+
+    def _under_data_dir(self, conf_key, *paths, mkdirs=False) -> str:
+        dirpath = self.conf[conf_key]
+        if not mkdirs:
+            return utils.abs_path_join(dirpath, *paths)
+        return utils.abs_path_join_and_mkdirs(dirpath, *paths)
+
+    def under_data_dir(self, *paths, mkdirs=False) -> str:
+        return self._under_data_dir('data_dir', *paths, mkdirs=mkdirs)
+
+    def _under_resources_dir(self, conf_key, default, *paths) -> str:
+        dirpath = self.conf.get(conf_key)
+        if not dirpath:
+            dirpath = self.under_project_dir(default)
+        if not os.path.isdir(dirpath):
+            raise NotADirectoryError(dirpath)
+        return utils.abs_path_join(dirpath, *paths)
+
+    def under_resources_dir(self, *paths) -> str:
+        f = self._under_resources_dir
+        return f('resources_dir', 'resources', *paths)
