@@ -42,9 +42,9 @@ Access config:
 
 ```
 >>> from example.environ import GlobalInterface 
->>> gi = GlobalInterface()  # note that GlobalInterface is a singlon class
+>>> gi = GlobalInterface()  # note that GlobalInterface is a sington class
 >>> print(gi.conf)
-{'data_dir': '/data/local/example', 'sqlite': '/data/local/example/db.sqlite'}
+{'upstram_prefix': 'http://127.0.0.1:9100', 'sqlite': '/data/local/example/db.sqlite'}
 ```
 
 Note that `GlobalInterface` is a singlon class, which means that 
@@ -58,8 +58,7 @@ The recommended usage of `GlobalInterface()` is to create instanciate it
 at the top each module:
 
 ```python
-import re
-import math
+from example.environ import GlobalInterface  # noqa
 from example.tools import your_funny_tool  # noqa
 
 gi = GlobalInterface()
