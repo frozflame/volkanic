@@ -42,12 +42,12 @@ class WeakSingleton(metaclass=WeakSingletonMeta):
 class _GIMeta(SingletonMeta):
     def __new__(mcs, name, bases, attrs):
         pn = attrs.get('package_name')
+        if pn is None:
+            msg = '{}.package_name is missing'.format(name)
+            raise ValueError(msg)
         if not isinstance(pn, str):
             msg = '{}.package_name is of wrong type'.format(name)
             raise TypeError(msg)
-        if not pn:
-            msg = '{}.package_name is missing'.format(name)
-            raise ValueError(msg)
         if not re.match(r'\w[\w.]*\w', pn):
             msg = 'invalid {}.package_name: "{}"'.format(name, pn)
             raise ValueError(msg)
