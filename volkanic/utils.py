@@ -159,3 +159,11 @@ def indented_json_print(obj, **kwargs):
         if key in kwargs:
             print_kwargs[key] = kwargs.pop(key)
     print(indented_json_dumps(obj, **kwargs), **print_kwargs)
+
+
+def load_json5_file(path: str):
+    if path.endswith('.json'):
+        import json
+        return json.loads(open(path, 'rb').read())
+    import json5
+    return json5.load(open(path))

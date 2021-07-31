@@ -8,8 +8,6 @@ import re
 import sys
 import weakref
 
-import json5
-
 from volkanic import utils
 from volkanic.compat import cached_property, abstract_property
 
@@ -123,7 +121,7 @@ class GlobalInterface(metaclass=_GIMeta):
 
     @staticmethod
     def _parse_conf(path: str):
-        return json5.load(open(path))
+        return utils.load_json5_file(path)
 
     @cached_property
     def conf(self) -> dict:
@@ -202,3 +200,10 @@ class GIMixinDirs:
     def under_resources_dir(self, *paths) -> str:
         f = self._under_resources_dir
         return f('resources_dir', 'resources', *paths)
+
+    def under_temp_path(self, ext=''):
+        name = os.urandom(17).hex() + ext
+        return self.under_data_dir('tmp', name, mkdirs=True)
+
+    # will be removed
+    get_temp_path = under_temp_path
