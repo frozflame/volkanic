@@ -74,11 +74,17 @@ class GlobalInterface(metaclass=_GIMeta):
     # dot '.' in package_name replaced by underscore '_'
     identifier = _PackageNameDerivant('_')
 
-    # for project dir locating (under_project_dir())
-    project_source_depth = 0
+    _options = {
+        # for project dir locating (under_project_dir())
+        'project_source_depth': 0,
+        # for config file locating (_get_conf_paths())
+        'config_filename': 'config.json5',
+    }
 
     # default config and log format
-    default_config = {}
+    default_config = {
+        '_jinja2_env': {},
+    }
     default_logfmt = \
         '%(asctime)s %(levelname)s [%(process)s,%(thread)s] %(name)s %(message)s'
 
@@ -94,12 +100,13 @@ class GlobalInterface(metaclass=_GIMeta):
         """
         envvar_name = cls._fmt_envvar_name('confpath')
         pn = cls.project_name
+        fn = cls._options['config_filename']
         return [
             os.environ.get(envvar_name),
-            cls.under_project_dir('config.json5'),
-            cls.under_home_dir('.{}/config.json5'.format(pn)),
-            '/etc/{}/config.json5'.format(pn),
-            '/{}/config.json5'.format(pn),
+            cls.under_project_dir(fn),
+            cls.under_home_dir('.{}/{}'.format(pn, fn)),
+            '/etc/{}/{}'.format(pn, fn),
+            '/{}/{}'.format(pn, fn),
         ]
 
     _get_conf_search_paths = _get_conf_paths
@@ -148,7 +155,7 @@ class GlobalInterface(metaclass=_GIMeta):
         pkg_dir = cls.under_package_dir()
         if re.search(r'[/\\](site|dist)-packages[/\\]', pkg_dir):
             return
-        n = cls.project_source_depth
+        n = cls._options['project_source_depth']
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
         return utils.abs_path_join(pkg_dir, *paths)
@@ -159,7 +166,8 @@ class GlobalInterface(metaclass=_GIMeta):
         from jinja2 import Environment, PackageLoader, select_autoescape
         return Environment(
             loader=PackageLoader(self.package_name, 'templates'),
-            autoescape=select_autoescape(['html', 'xml'])
+            autoescape=select_autoescape(['html', 'xml']),
+            **self.conf['_jinja2_env']
         )
 
     @classmethod

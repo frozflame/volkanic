@@ -4,3 +4,4 @@
 from volkanic.__main__ import *     # noqa
 from volkanic.utils import *        # noqa
 
+# This module will be removed soon.
