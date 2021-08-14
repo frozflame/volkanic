@@ -4,6 +4,7 @@
 import importlib
 import os
 import sys
+import functools
 
 
 def attr_query(obj, *attrnames):
@@ -167,3 +168,13 @@ def load_json5_file(path: str):
         return json.loads(open(path, 'rb').read())
     import json5
     return json5.load(open(path))
+
+
+def discard_arguments(func):
+    """Discard arguments and call a argument-less function"""
+
+    @functools.wraps(func)
+    def _func(*_args, **_kwargs):
+        return func()
+
+    return _func
