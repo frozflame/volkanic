@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-from __future__ import unicode_literals, print_function
-
 import volkanic.cmdline
 from volkanic.utils import (
     desktop_open, where, where_site_packages
