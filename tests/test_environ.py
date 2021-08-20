@@ -7,7 +7,7 @@ from volkanic.environ import GIMixinDirs
 
 
 class GlobalInterface(volkanic.GlobalInterface, GIMixinDirs):
-    default_config = {'data_dir': '/tmp1/data'}
+    default_config = {'data_dir': '/data/local/volkanic'}
     package_name = 'os.path'
 
 
@@ -42,4 +42,4 @@ def test_under_dir():
     _eq(volk_gi.under_package_dir(),
         utils.under_parent_dir(volkanic.__file__))
     _eq(test_gi.under_data_dir(),
-        '/tmp1/data')
+        '/data/local/volkanic')
