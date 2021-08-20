@@ -182,10 +182,8 @@ class ErrorBase(Exception):
     def __str__(self):
         if not self.args:
             return ''
-        if len(self.args) == 1:
+        if len(self.args):
             return str(self.args[0])
-        m, k = self.args[:2]
-        return '{} <{}>'.format(m, k)
 
     def to_dict(self):
         return {
