@@ -201,7 +201,7 @@ class GIMixinDirs:
         dirpath = self.conf.get(conf_key)
         if not dirpath:
             dirpath = self.under_project_dir(default)
-        if not os.path.isdir(dirpath):
+        if not dirpath or not os.path.isdir(dirpath):
             raise NotADirectoryError(dirpath)
         return utils.abs_path_join(dirpath, *paths)
 
