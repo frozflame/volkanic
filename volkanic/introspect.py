@@ -182,8 +182,7 @@ class ErrorBase(Exception):
     def __str__(self):
         if not self.args:
             return ''
-        if len(self.args):
-            return str(self.args[0])
+        return str(self.args[0])
 
     def to_dict(self):
         return {
