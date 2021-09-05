@@ -159,7 +159,8 @@ def indented_json_print(obj, **kwargs):
     for key in print_keywords:
         if key in kwargs:
             print_kwargs[key] = kwargs.pop(key)
-    print(indented_json_dumps(obj, **kwargs), **print_kwargs)
+    dumps = kwargs.pop('dumps', indented_json_dumps)
+    print(dumps(obj, **kwargs), **print_kwargs)
 
 
 def load_json5_file(path: str):
