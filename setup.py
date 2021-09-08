@@ -6,10 +6,9 @@ import re
 
 from setuptools import setup, find_packages
 
+
 # import volkanic; exit(1)
 # DO NOT import your package from your setup.py
-
-description = 'auxiliary tools dealing with paths and config files'
 
 
 def read(filename):
@@ -40,7 +39,8 @@ def find_version():
 config = {
     'name': 'volkanic',
     'version': find_version(),
-    'description': description,
+    'description':
+        "Interface with config files and shell prompts easily and elegantly",
     'keywords': '',
     'url': "https://github.com/frozflame/volkanic",
     'author': 'frozflame',

@@ -1,7 +1,7 @@
 volkanic
 ========
 
-Auxiliary tools dealing with paths and config files. 
+Interface with config files and shell prompts easily and elegantly.
 
 To install (add `sudo` if necessary)
 
