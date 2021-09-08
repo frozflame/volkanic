@@ -21,7 +21,9 @@ def attr_setdefault(obj, attrname, value):
         return value
 
 
+# deprecated names
 query_attr = attr_query
+subattr = query_attr
 
 
 def merge_dicts(*dicts):
@@ -31,7 +33,13 @@ def merge_dicts(*dicts):
     return retdic
 
 
-subattr = query_attr
+def select_from_dict(dict_: dict, fields: list, pop=False):
+    sub_dict = {}
+    method = dict_.pop if pop else dict_.get
+    for key in fields:
+        if key in dict_:
+            sub_dict[key] = method(key, None)
+    return sub_dict
 
 
 def load_symbol(symbolpath):
