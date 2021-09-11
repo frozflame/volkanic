@@ -167,7 +167,7 @@ class GlobalInterface(metaclass=_GIMeta):
         return Environment(
             loader=PackageLoader(self.package_name, 'templates'),
             autoescape=select_autoescape(['html', 'xml']),
-            **self.conf['_jinja2_env']
+            **self.conf.get('_jinja2_env', {})
         )
 
     @classmethod
