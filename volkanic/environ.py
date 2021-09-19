@@ -11,7 +11,12 @@ import weakref
 from volkanic import utils
 from volkanic.compat import cached_property, abstract_property
 
-logger = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
+
+
+def _printerr(*args, **kwargs):
+    kwargs.setdefault('file', sys.stderr)
+    print(*args, **kwargs)
 
 
 class SingletonMeta(type):
@@ -136,10 +141,10 @@ class GlobalInterface(metaclass=_GIMeta):
         cn = self.__class__.__name__
         if path:
             config = self._parse_conf(path)
-            print('{}.conf, path'.format(cn), path, file=sys.stderr)
+            _printerr('{}.conf, path'.format(cn), path)
         else:
             config = {}
-            print('{}.conf, hard-coded'.format(cn), file=sys.stderr)
+            _printerr('{}.conf, hard-coded'.format(cn))
         return utils.merge_dicts(self.default_config, config)
 
     @staticmethod
@@ -209,9 +214,10 @@ class GIMixinDirs:
         f = self._under_resources_dir
         return f('resources_dir', 'resources', *paths)
 
-    def under_temp_path(self, ext=''):
+    def under_temp_dir(self, ext=''):
         name = os.urandom(17).hex() + ext
         return self.under_data_dir('tmp', name, mkdirs=True)
 
-    # will be removed
-    get_temp_path = under_temp_path
+    # both will be removed
+    get_temp_path = under_temp_dir
+    under_temp_path = under_temp_dir
