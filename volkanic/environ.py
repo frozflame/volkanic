@@ -5,18 +5,12 @@ import abc
 import logging
 import os
 import re
-import sys
 import weakref
 
 from volkanic import utils
 from volkanic.compat import cached_property, abstract_property
 
 _logger = logging.getLogger(__name__)
-
-
-def _printerr(*args, **kwargs):
-    kwargs.setdefault('file', sys.stderr)
-    print(*args, **kwargs)
 
 
 class SingletonMeta(type):
@@ -141,10 +135,10 @@ class GlobalInterface(metaclass=_GIMeta):
         cn = self.__class__.__name__
         if path:
             config = self._parse_conf(path)
-            _printerr('{}.conf, path'.format(cn), path)
+            utils.printerr('{}.conf, path'.format(cn), path)
         else:
             config = {}
-            _printerr('{}.conf, hard-coded'.format(cn))
+            utils.printerr('{}.conf, hard-coded'.format(cn))
         return utils.merge_dicts(self.default_config, config)
 
     @staticmethod
@@ -184,6 +178,8 @@ class GlobalInterface(metaclass=_GIMeta):
         logging.basicConfig(level=level, format=fmt)
 
 
+# deprecated
+# this class will be removed at ver 0.4.0
 class GIMixinDirs:
     @abstract_property
     def conf(self) -> dict:

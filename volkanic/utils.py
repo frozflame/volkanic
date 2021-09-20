@@ -187,3 +187,8 @@ def discard_arguments(func):
         return func()
 
     return _func
+
+
+def printerr(*args, **kwargs):
+    kwargs.setdefault('file', sys.stderr)
+    print(*args, **kwargs)
