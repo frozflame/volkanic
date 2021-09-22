@@ -52,10 +52,9 @@ def format_function_path(func):
     return '{}.{}'.format(klass_path, func.__name__)
 
 
-def _to_dot_path(path: str):
+def _dot_path(path: str):
+    """Convert unix path to python module dot-path"""
     path, ext = os.path.splitext(path)
-    if not ext == '.py':
-        return
     parts = path.split(os.sep)
     if len(parts) > 1 and parts[-1] == '__init__':
         parts = parts[:-1]
@@ -66,10 +65,18 @@ def _to_dot_path(path: str):
     return '.'.join(parts)
 
 
-def find_all_plain_modules(search_dir: str):
+def find_all_py_files(search_dir: str, relative=False):
     for path in setuptools.findall(search_dir):
-        path = os.path.relpath(path, search_dir)
-        dotpath = _to_dot_path(path)
+        if not path.endswith('.py'):
+            continue
+        if relative:
+            path = os.path.relpath(path, search_dir)
+        yield path
+
+
+def find_all_plain_modules(search_dir: str):
+    for path in find_all_py_files(search_dir, relative=True):
+        dotpath = _dot_path(path)
         if not dotpath:
             continue
         yield dotpath
