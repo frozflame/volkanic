@@ -52,13 +52,13 @@ class _GIMeta(SingletonMeta):
 
 
 class _PackageNameDerivant:
-    __slots__ = ['_replacement']
+    __slots__ = ['_sep']
 
-    def __init__(self, replacement):
-        self._replacement = replacement
+    def __init__(self, sep):
+        self._sep = sep
 
     def __get__(self, _, owner):
-        return owner.package_name.replace('.', self._replacement)
+        return owner.package_name.replace('.', self._sep)
 
 
 class GlobalInterface(metaclass=_GIMeta):
@@ -77,9 +77,9 @@ class GlobalInterface(metaclass=_GIMeta):
         # for project dir locating (under_project_dir())
         'project_source_depth': 0,
         # for config file locating (_get_conf_paths())
-        'config_filename': 'config.json5',
+        'confpath_filename': 'config.json5',
         # for config file locating (_get_conf_paths())
-        'namespaced_config_path': False,
+        'confpath_dirname_sep': '-',
     }
 
     # default config and log format
@@ -103,18 +103,18 @@ class GlobalInterface(metaclass=_GIMeta):
                 pass
 
     @classmethod
+    def _fmt_name(cls, sep='-'):
+        return cls.package_name.replace('.', sep)
+
+    @classmethod
     def _get_conf_paths(cls):
         """
         Make sure this method can be called without arguments.
         Override this method in your subclasses for your specific project.
         """
         envvar_name = cls._fmt_envvar_name('confpath')
-        fn = cls._get_option('config_filename')
-        if cls._get_option('namespaced_config_path'):
-            pn = '/'.join(cls.package_name.split('.'))
-        else:
-            pn = cls.project_name
-
+        fn = cls._get_option('confpath_filename')
+        pn = cls._fmt_name(cls._get_option('confpath_dirname_sep'))
         return [
             os.environ.get(envvar_name),
             cls.under_project_dir(fn),
