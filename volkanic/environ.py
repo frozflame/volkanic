@@ -78,6 +78,8 @@ class GlobalInterface(metaclass=_GIMeta):
         'project_source_depth': 0,
         # for config file locating (_get_conf_paths())
         'config_filename': 'config.json5',
+        # for config file locating (_get_conf_paths())
+        'namespaced_config_path': False,
     }
 
     # default config and log format
@@ -92,22 +94,37 @@ class GlobalInterface(metaclass=_GIMeta):
         return '{}_{}'.format(cls.identifier, name).upper()
 
     @classmethod
+    def _get_option(cls, key: str):
+        for c in cls.mro():
+            options = c.__dict__.get('_options')
+            try:
+                return options[key]
+            except (KeyError, TypeError):
+                pass
+
+    @classmethod
     def _get_conf_paths(cls):
         """
         Make sure this method can be called without arguments.
         Override this method in your subclasses for your specific project.
         """
         envvar_name = cls._fmt_envvar_name('confpath')
-        pn = cls.project_name
-        fn = cls._options['config_filename']
+        fn = cls._get_option('config_filename')
+        if cls._get_option('namespaced_config_path'):
+            pn = '/'.join(cls.package_name.split('.'))
+        else:
+            pn = cls.project_name
+
         return [
             os.environ.get(envvar_name),
             cls.under_project_dir(fn),
-            cls.under_home_dir('.{}/{}'.format(pn, fn)),
+            utils.under_home_dir('.{}/{}'.format(pn, fn)),
             '/etc/{}/{}'.format(pn, fn),
             '/{}/{}'.format(pn, fn),
         ]
 
+    # _get_conf_search_paths is deprecated
+    # _get_conf_search_paths will be remove at ver 0.5.0
     _get_conf_search_paths = _get_conf_paths
 
     @classmethod
@@ -115,6 +132,8 @@ class GlobalInterface(metaclass=_GIMeta):
         """
         Returns: (str) absolute path to config file
         """
+        # _get_conf_search_paths is deprecated
+        # _get_conf_search_paths will be remove at ver 0.5.0
         func = getattr(cls, '_get_conf_search_paths', None)
         if func is None:
             func = cls._get_conf_paths
@@ -154,11 +173,13 @@ class GlobalInterface(metaclass=_GIMeta):
         pkg_dir = cls.under_package_dir()
         if re.search(r'[/\\](site|dist)-packages[/\\]', pkg_dir):
             return
-        n = cls._options['project_source_depth']
+        n = cls._get_option('project_source_depth')
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
         return utils.abs_path_join(pkg_dir, *paths)
 
+    # deprecated
+    # this method will be removed at ver 0.5.0
     @cached_property
     def jinja2_env(self):
         # noinspection PyPackageRequirements
