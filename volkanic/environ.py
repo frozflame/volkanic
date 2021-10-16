@@ -148,6 +148,10 @@ class GlobalInterface(metaclass=_GIMeta):
     def _parse_conf(path: str):
         return utils.load_json5_file(path)
 
+    @staticmethod
+    def _check_conf(config: dict):
+        return config
+
     @cached_property
     def conf(self) -> dict:
         path = self._locate_conf()
@@ -158,7 +162,8 @@ class GlobalInterface(metaclass=_GIMeta):
         else:
             config = {}
             utils.printerr('{}.conf, hard-coded'.format(cn))
-        return utils.merge_dicts(self.default_config, config)
+        config = utils.merge_dicts(self.default_config, config)
+        return self._check_conf(config)
 
     @staticmethod
     def under_home_dir(*paths):
