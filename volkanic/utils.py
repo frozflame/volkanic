@@ -174,7 +174,7 @@ def indented_json_print(obj, **kwargs):
 def load_json5_file(path: str):
     if path.endswith('.json'):
         import json
-        return json.loads(open(path, 'rb').read())
+        return json.loads(open(path).read())
     import json5
     return json5.load(open(path))
 
