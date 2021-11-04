@@ -192,11 +192,9 @@ class ErrorBase(Exception):
         return str(self.args[0])
 
     def to_dict(self):
-        return {
-            'message': str(self),
-            'error_key': self.error_key,
-            **self.extra,
-        }
+        dic = {'message': str(self), 'error_key': self.error_key}
+        dic.update(self.extra)
+        return dic
 
 
 class ErrorInfo(object):
