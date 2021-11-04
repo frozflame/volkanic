@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import functools
 import importlib
 import os
 import sys
-import functools
 
 
 def attr_query(obj, *attrnames):
@@ -27,6 +27,9 @@ subattr = query_attr
 
 
 def merge_dicts(*dicts):
+    # a list of dicts is acceptable
+    if len(dicts) == 1 and isinstance(dicts[0], list):
+        dicts = dicts[0]
     retdic = {}
     for dic in dicts:
         retdic.update(dic)
@@ -179,7 +182,7 @@ def load_json5_file(path: str):
     return json5.load(open(path))
 
 
-def discard_arguments(func):
+def ignore_arguments(func):
     """Discard arguments and call a argument-less function"""
 
     @functools.wraps(func)
@@ -187,6 +190,9 @@ def discard_arguments(func):
         return func()
 
     return _func
+
+
+discard_arguments = ignore_arguments
 
 
 def printerr(*args, **kwargs):
