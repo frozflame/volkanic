@@ -198,6 +198,8 @@ class ErrorBase(Exception):
 
 
 class ErrorInfo(object):
+    module_prefix = ''
+
     @staticmethod
     def calc_error_hash(exc_string: str):
         h = hashlib.md5(exc_string.encode('utf-8')).hexdigest()[:4]
@@ -227,7 +229,7 @@ class ErrorInfo(object):
         print(self.exc_string, file=sys.stderr)
 
     @cached_property
-    def debug_info(self, prefix=''):
+    def debug_info(self):
         tb = self.exc.__traceback__
         if tb is None:
             return
@@ -236,14 +238,14 @@ class ErrorInfo(object):
         frame = tb.tb_frame
         # looking for the first frame
         # whose code is defined in package
-        # whose full-qual-name starts with `prefix`
+        # whose full-qual-name starts with `self.module_prefix`
         info = {
             'exc': self.exc_string,
             'created_at': self.created_at.isoformat(),
         }
         while frame:
             name = inspect.getmodule(frame).__name__
-            if name.startswith(prefix):
+            if name.startswith(self.module_prefix):
                 _globals = copy.copy(frame.f_globals)
                 # __builtins__ is large but not very useful
                 _globals.pop('__builtins__', None)
