@@ -35,6 +35,12 @@ def test_names():
     _eq(GlobalInterface.project_name, 'os-path')
     _eq(GlobalInterface.identifier, 'os_path')
 
+    class GI1(GlobalInterface):
+        package_name = 'hello_world.demo'
+
+    _eq(GI1.project_name, 'hello-world-demo')
+    _eq(GI1.identifier, 'hello_world_demo')
+
 
 def test_under_dir():
     _eq(volk_gi.under_package_dir('a', 'b'),

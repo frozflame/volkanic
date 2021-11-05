@@ -52,13 +52,15 @@ class _GIMeta(SingletonMeta):
 
 
 class _PackageNameDerivant:
-    __slots__ = ['_sep']
+    __slots__ = ['sep']
+    regex = re.compile(r'[._]+')
 
-    def __init__(self, sep):
-        self._sep = sep
+    def __init__(self, sep: str):
+        self.sep = sep
 
     def __get__(self, _, owner):
-        return owner.package_name.replace('.', self._sep)
+        parts = self.regex.split(owner.package_name)
+        return self.sep.join(parts)
 
 
 class GlobalInterface(metaclass=_GIMeta):
@@ -102,7 +104,12 @@ class GlobalInterface(metaclass=_GIMeta):
 
     @classmethod
     def _fmt_name(cls, sep='-'):
-        return cls.package_name.replace('.', sep)
+        parts = _PackageNameDerivant.regex.split(cls.package_name)
+        return sep.join(parts)
+
+    @classmethod
+    def _get_conf_path_names(cls):
+        return [cls.project_name, cls._get_option('confpath_filename')]
 
     @classmethod
     def _get_conf_paths(cls):
@@ -111,14 +118,14 @@ class GlobalInterface(metaclass=_GIMeta):
         Override this method in your subclasses for your specific project.
         """
         envvar_name = cls._fmt_envvar_name('confpath')
-        fn = cls._get_option('confpath_filename')
-        pn = cls.project_name
+        names = cls._get_conf_path_names()
+        relative_path = os.path.join(*names)
         return [
             os.environ.get(envvar_name),
-            cls.under_project_dir(fn),
-            utils.under_home_dir('.{}/{}'.format(pn, fn)),
-            '/etc/{}/{}'.format(pn, fn),
-            '/{}/{}'.format(pn, fn),
+            cls.under_project_dir(names[-1]),
+            utils.under_home_dir('.' + relative_path),
+            os.path.join('/etc', relative_path),
+            os.path.join('/', relative_path),
         ]
 
     # _get_conf_search_paths is deprecated
@@ -180,6 +187,18 @@ class GlobalInterface(metaclass=_GIMeta):
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
         return utils.abs_path_join(pkg_dir, *paths)
+
+    def debug(self):
+        return {
+            'identifier': self.identifier,
+            'package_name': self.package_name,
+            'project_name': self.project_name,
+            'project_dir': self.under_project_dir(),
+            'package_dir': self.under_package_dir(),
+            'conf_paths': self._get_conf_paths(),
+            'conf_path': self._locate_conf(),
+            'conf': self.conf,
+        }
 
     # deprecated
     # this method will be removed at ver 0.5.0
