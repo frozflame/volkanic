@@ -36,10 +36,37 @@ def test_names():
     _eq(GlobalInterface.identifier, 'os_path')
 
     class GI1(GlobalInterface):
-        package_name = 'hello_world.demo'
+        package_name = 'hello_world.demo1'
 
-    _eq(GI1.project_name, 'hello-world-demo')
-    _eq(GI1.identifier, 'hello_world_demo')
+    _eq(GI1.project_name, 'hello-world-demo1')
+    _eq(GI1.identifier, 'hello_world_demo1')
+
+
+
+def test_bad_package_name():
+    try:
+        class BadGI0(volkanic.GlobalInterface):
+            package_name = None
+    except ValueError as e:
+        print('ValueError raised as expected: {}'.format(e))
+    else:
+        raise Exception('bad GI0.package_name is not reported')
+
+    try:
+        class BadGI1(volkanic.GlobalInterface):
+            package_name = 'hello_world-demo'
+    except ValueError as e:
+        print('ValueError raised as expected: {}'.format(e))
+    else:
+        raise Exception('bad GI1.package_name is not reported')
+
+    try:
+        class BadGI2(GlobalInterface):
+            package_name = 2
+    except TypeError as e:
+        print('TypeError raised as expected: {}'.format(e))
+    else:
+        raise Exception('bad GI2.package_name is not reported')
 
 
 def test_under_dir():

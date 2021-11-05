@@ -45,7 +45,7 @@ class _GIMeta(SingletonMeta):
         if not isinstance(pn, str):
             msg = '{}.package_name is of wrong type'.format(name)
             raise TypeError(msg)
-        if not re.match(r'\w[\w.]*\w', pn):
+        if not re.match(r'\w[\w.]*\w$', pn):
             msg = 'invalid {}.package_name: "{}"'.format(name, pn)
             raise ValueError(msg)
         return super().__new__(mcs, name, bases, attrs)
@@ -191,7 +191,9 @@ class GlobalInterface(metaclass=_GIMeta):
         return utils.abs_path_join(pkg_dir, *paths)
 
     def debug(self):
+        mcs = self.__class__.__class__
         return {
+            'registered_instances': mcs.registered_instances,
             'identifier': self.identifier,
             'package_name': self.package_name,
             'project_name': self.project_name,
