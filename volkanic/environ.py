@@ -59,8 +59,7 @@ class _PackageNameDerivant:
         self.sep = sep
 
     def __get__(self, _, owner: 'GlobalInterface'):
-        parts = self.regex.split(owner.package_name)
-        return self.sep.join(parts)
+        return self.regex.sub(self.sep, owner.package_name)
 
 
 class GlobalInterface(metaclass=_GIMeta):
@@ -68,11 +67,11 @@ class GlobalInterface(metaclass=_GIMeta):
     package_name = 'volkanic'
 
     # for path and url
-    # dot '.' in package_name replaced by hyphen '-'
+    # '[._]+' in package_name replaced by hyphen '-'
     project_name = _PackageNameDerivant('-')
 
     # for symbols in code
-    # dot '.' in package_name replaced by underscore '_'
+    # '[._]+' in package_name replaced by underscore '_'
     identifier = _PackageNameDerivant('_')
 
     _options = {
@@ -108,7 +107,7 @@ class GlobalInterface(metaclass=_GIMeta):
 
     @classmethod
     def _fmt_name(cls, sep='-'):
-        return sep.join(cls._split_name())
+        return _PackageNameDerivant.regex.sub(sep, cls.package_name)
 
     @classmethod
     def _get_conf_path_names(cls):
