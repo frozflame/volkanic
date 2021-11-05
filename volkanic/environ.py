@@ -78,8 +78,6 @@ class GlobalInterface(metaclass=_GIMeta):
         'project_source_depth': 0,
         # for config file locating (_get_conf_paths())
         'confpath_filename': 'config.json5',
-        # for config file locating (_get_conf_paths())
-        'confpath_dirname_sep': '-',
     }
 
     # default config and log format
@@ -114,7 +112,7 @@ class GlobalInterface(metaclass=_GIMeta):
         """
         envvar_name = cls._fmt_envvar_name('confpath')
         fn = cls._get_option('confpath_filename')
-        pn = cls._fmt_name(cls._get_option('confpath_dirname_sep'))
+        pn = cls.project_name
         return [
             os.environ.get(envvar_name),
             cls.under_project_dir(fn),
