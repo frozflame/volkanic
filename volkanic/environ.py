@@ -58,7 +58,7 @@ class _PackageNameDerivant:
     def __init__(self, sep: str):
         self.sep = sep
 
-    def __get__(self, _, owner):
+    def __get__(self, _, owner: 'GlobalInterface'):
         parts = self.regex.split(owner.package_name)
         return self.sep.join(parts)
 
@@ -103,9 +103,12 @@ class GlobalInterface(metaclass=_GIMeta):
                 pass
 
     @classmethod
+    def _split_name(cls):
+        return _PackageNameDerivant.regex.split(cls.package_name)
+
+    @classmethod
     def _fmt_name(cls, sep='-'):
-        parts = _PackageNameDerivant.regex.split(cls.package_name)
-        return sep.join(parts)
+        return sep.join(cls._split_name())
 
     @classmethod
     def _get_conf_path_names(cls):
