@@ -190,18 +190,23 @@ class GlobalInterface(metaclass=_GIMeta):
         paths = ['..'] * n + list(paths)
         return utils.abs_path_join(pkg_dir, *paths)
 
-    def debug(self):
-        mcs = self.__class__.__class__
+    @classmethod
+    def debug(cls) -> dict:
+        mcs = cls.__class__
+        try:
+            conf = mcs.registered_instances[cls].__dict__['conf']
+        except KeyError:
+            conf = None
         return {
+            'identifier': cls.identifier,
+            'package_name': cls.package_name,
+            'project_name': cls.project_name,
+            'project_dir': cls.under_project_dir(),
+            'package_dir': cls.under_package_dir(),
             'registered_instances': mcs.registered_instances,
-            'identifier': self.identifier,
-            'package_name': self.package_name,
-            'project_name': self.project_name,
-            'project_dir': self.under_project_dir(),
-            'package_dir': self.under_package_dir(),
-            'conf_paths': self._get_conf_paths(),
-            'conf_path': self._locate_conf(),
-            'conf': self.conf,
+            'conf_paths': cls._get_conf_paths(),
+            'conf_path': cls._locate_conf(),
+            'conf': conf,
         }
 
     # deprecated
