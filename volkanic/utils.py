@@ -162,6 +162,7 @@ def indented_json_dumps(obj, dumps=None, **kwargs):
         dumps = json.dumps
     kwargs.setdefault('indent', 4)
     kwargs.setdefault('default', str)
+    kwargs.setdefault('sort_keys', True)
     kwargs.setdefault('ensure_ascii', False)
     return dumps(obj, **kwargs)
 
