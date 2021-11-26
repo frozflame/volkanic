@@ -1,2 +1,2 @@
-pyyaml>=5.1
+pyyaml
 json5>=0.9.5

@@ -191,12 +191,20 @@ class GlobalInterface(metaclass=_GIMeta):
         return utils.abs_path_join(pkg_dir, *paths)
 
     @classmethod
-    def debug(cls) -> dict:
+    def _get_self(cls):
         mcs = cls.__class__
         try:
-            conf = mcs.registered_instances[cls].__dict__['conf']
+            return mcs.registered_instances[cls]
         except KeyError:
+            pass
+
+    @classmethod
+    def debug(cls) -> dict:
+        try:
+            conf = cls._get_self().__dict__['conf']
+        except (AttributeError, KeyError):
             conf = None
+        mcs = cls.__class__
         return {
             'identifier': cls.identifier,
             'package_name': cls.package_name,
@@ -228,6 +236,7 @@ class GlobalInterface(metaclass=_GIMeta):
             level = os.environ.get(envvar_name, 'DEBUG')
         fmt = fmt or cls.default_logfmt
         logging.basicConfig(level=level, format=fmt)
+
 
 
 # deprecated
@@ -269,3 +278,8 @@ class GIMixinDirs:
     # both will be removed
     get_temp_path = under_temp_dir
     under_temp_path = under_temp_dir
+
+
+class GlobalInterfaceExtended(GlobalInterface, GIMixinDirs):
+    package_name = 'volkanic'
+
