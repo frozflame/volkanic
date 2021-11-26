@@ -156,21 +156,24 @@ def where_site_packages():
             return p
 
 
-def indented_json_dumps(obj, **kwargs):
-    import json
+def indented_json_dumps(obj, dumps=None, **kwargs):
+    if dumps is None:
+        import json
+        dumps = json.dumps
     kwargs.setdefault('indent', 4)
     kwargs.setdefault('default', str)
     kwargs.setdefault('ensure_ascii', False)
-    return json.dumps(obj, **kwargs)
+    return dumps(obj, **kwargs)
 
 
-def indented_json_print(obj, **kwargs):
+def indented_json_print(obj, dumps=None, **kwargs):
     print_kwargs = {}
     print_keywords = ['sep', 'end', 'file', 'flush']
     for key in print_keywords:
         if key in kwargs:
             print_kwargs[key] = kwargs.pop(key)
-    dumps = kwargs.pop('dumps', indented_json_dumps)
+    if dumps is None:
+        dumps = indented_json_dumps
     print(dumps(obj, **kwargs), **print_kwargs)
 
 
