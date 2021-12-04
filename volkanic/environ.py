@@ -238,7 +238,6 @@ class GlobalInterface(metaclass=_GIMeta):
         logging.basicConfig(level=level, format=fmt)
 
 
-
 # deprecated
 # this class will be removed at ver 0.4.0
 class GIMixinDirs:
@@ -280,6 +279,8 @@ class GIMixinDirs:
     under_temp_path = under_temp_dir
 
 
-class GlobalInterfaceExtended(GlobalInterface, GIMixinDirs):
+class GlobalInterfaceTrial(GlobalInterface, GIMixinDirs):
     package_name = 'volkanic'
 
+
+GlobalInterfacePlus = GlobalInterfaceTrial
