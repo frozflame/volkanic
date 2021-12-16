@@ -2,6 +2,7 @@
 # coding: utf-8
 
 from volkanic import introspect
+from volkanic.introspect import ErrorBase
 
 
 def test_path_formatters():
@@ -12,6 +13,15 @@ def test_path_formatters():
     ]
     for v in vals:
         print(v)
+
+
+def test_errorbase():
+    eb = ErrorBase()
+    d = eb.to_dict()
+    assert ErrorBase.from_dict(d).to_dict() == d
+    eb = ErrorBase('bad-request', 'EB-1234')
+    d = eb.to_dict()
+    assert ErrorBase.from_dict(d).to_dict() == d
 
 
 if __name__ == '__main__':

@@ -192,6 +192,8 @@ class ErrorBase(Exception):
         return str(self.args[0])
 
     def to_dict(self):
+        if len(self.args) > 2 and isinstance(self.args[2], dict):
+            return self.args[2]
         dic = {'message': str(self), 'error_key': self.error_key}
         dic.update(self.extra)
         return dic
@@ -200,7 +202,8 @@ class ErrorBase(Exception):
     def from_dict(cls, dic: dict):
         return cls(
             dic.get('message', ''),
-            dic.get('error_key', cls.__name__)
+            dic.get('error_key', cls.__name__),
+            dic,
         )
 
 
