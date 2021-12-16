@@ -196,6 +196,13 @@ class ErrorBase(Exception):
         dic.update(self.extra)
         return dic
 
+    @classmethod
+    def from_dict(cls, dic: dict):
+        return cls(
+            dic.get('message', ''),
+            dic.get('error_key', cls.__name__)
+        )
+
 
 class ErrorInfo(object):
     module_prefix = ''
