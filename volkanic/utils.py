@@ -202,3 +202,9 @@ discard_arguments = ignore_arguments
 def printerr(*args, **kwargs):
     kwargs.setdefault('file', sys.stderr)
     print(*args, **kwargs)
+
+
+def printfmt(*args, sep=' ', end=os.linesep):
+    sep = str(sep)
+    end = str(end)
+    return sep.join(str(x) for x in args) + end
