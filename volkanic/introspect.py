@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
+import warnings
 import copy
 import datetime
 import hashlib
@@ -212,6 +213,10 @@ class ErrorInfo(object):
 
     @staticmethod
     def calc_error_hash(exc_string: str):
+        warnings.warn(
+            "ErrorInfo.calc_error_hash is deprecated",
+            DeprecationWarning
+        )
         h = hashlib.md5(exc_string.encode('utf-8')).hexdigest()[:4]
         hexdigits = string.hexdigits[:16]
         trans = str.maketrans(hexdigits, 'ACEFHKOPQSTUVWXY')
@@ -228,12 +233,27 @@ class ErrorInfo(object):
         self.created_at = datetime.datetime.now()
 
     @cached_property
+    def error_hex(self):
+        b = exc_string.encode('utf-8')
+        return hashlib.md5(b).hexdigest()
+
+    @cached_property
+    def _error_hash(self):
+        hexdigits = string.hexdigits[:16]
+        trans = str.maketrans(hexdigits, 'ACEFHKOPQSTUVWXY')
+        return self.error_hex.translate(trans)
+
+    @cached_property
     def error_hash(self):
-        return self.calc_error_hash(self.exc_string)
+        warnings.warn(
+            "ErrorInfo.error_hash is deprecated",
+            DeprecationWarning
+        )
+        return self._error_hash
 
     @cached_property
     def error_key(self):
-        return '{}-{:%H%M}'.format(self.error_hash, self.created_at)
+        return '{}-{:%H%M}'.format(self._error_hash, self.created_at)
 
     def print_exc(self):
         print(self.exc_string, file=sys.stderr)
@@ -251,6 +271,7 @@ class ErrorInfo(object):
         # whose full-qual-name starts with `self.module_prefix`
         info = {
             'exc': self.exc_string,
+            'error_key': self.error_key,
             'created_at': self.created_at.isoformat(),
         }
         while frame:
