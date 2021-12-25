@@ -234,14 +234,14 @@ class ErrorInfo(object):
 
     @cached_property
     def error_hex(self):
-        b = exc_string.encode('utf-8')
+        b = self.exc_string.encode('utf-8')
         return hashlib.md5(b).hexdigest()
 
     @cached_property
     def _error_hash(self):
         hexdigits = string.hexdigits[:16]
         trans = str.maketrans(hexdigits, 'ACEFHKOPQSTUVWXY')
-        return self.error_hex.translate(trans)
+        return self.error_hex[:4].translate(trans)
 
     @cached_property
     def error_hash(self):
