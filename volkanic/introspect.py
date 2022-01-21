@@ -210,6 +210,7 @@ class ErrorBase(Exception):
 
 class ErrorInfo(object):
     module_prefix = ''
+    message = 'Application Error'
 
     @staticmethod
     def calc_error_hash(exc_string: str):
@@ -257,6 +258,15 @@ class ErrorInfo(object):
 
     def print_exc(self):
         print(self.exc_string, file=sys.stderr)
+
+    def to_dict(self, code=3):
+        if isinstance(self.exc, ErrorBase):
+            return self.exc.to_dict()
+        return {
+            'code': code,
+            'error_key': self.error_key,
+            'message': f'{self.message} <{self.error_key}>',
+        }
 
     @cached_property
     def debug_info(self):
