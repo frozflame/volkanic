@@ -30,11 +30,8 @@ def run_desktop_open(_, args):
     desktop_open(*args)
 
 
-run_command_conf = volkanic.CommandConf.run
-
 registry = volkanic.cmdline.CommandRegistry.from_entries({
     'volkanic.__main__:run_where': 'where',
     'volkanic.__main__:run_argv_debug': 'a',
     'volkanic.__main__:run_desktop_open': 'o',
-    'volkanic.__main__:run_command_conf': 'runconf',
 })
