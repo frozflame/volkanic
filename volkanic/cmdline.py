@@ -4,7 +4,7 @@
 import contextlib
 import os
 import sys
-from collections import OrderedDict
+from collections import deque, OrderedDict
 
 from volkanic.utils import load_symbol
 
@@ -21,6 +21,23 @@ def remember_cwd(path=None):
         os.chdir(prev_cwd)
 
 
+def _flatten_nested_tuple(tup: tuple) -> list:
+    """
+    >>> _flatten_nested_tuple((1, (2, (3, 4))))
+    [1, 2, 3, 4]
+    """
+    stack = list(tup)
+    values = []
+    while stack:
+        val = stack.pop()
+        if isinstance(val, tuple):
+            stack.extend(val)
+        else:
+            values.append(val)
+    values.reverse()
+    return values
+
+
 # experimental
 class CommandOptionDict(OrderedDict):
     def __init__(self, *args, **kwargs):
@@ -30,7 +47,7 @@ class CommandOptionDict(OrderedDict):
 
     @classmethod
     def _tuple_expand(cls, source_pairs, target_pairs: list):
-        """expand nested tuples -- recursively"""
+        """expand nested tuples -- recursively -- deprecated"""
         for key, val in source_pairs:
             if not isinstance(val, tuple):
                 target_pairs.append((key, val))
@@ -39,20 +56,26 @@ class CommandOptionDict(OrderedDict):
             pairs = [(key, v) for v in val]
             cls._tuple_expand(pairs, target_pairs)
 
+    @staticmethod
+    def _explode(key, val):
+        if val is None or val is False:
+            return []
+        if val is True:
+            return [key]
+        if isinstance(val, list):
+            return [key] + val
+        if isinstance(val, tuple):
+            values = []
+            for v in _flatten_nested_tuple(val):
+                values.extend((key, v))
+            return values
+        return [key, str(val)]
+
     def as_args(self):
         pairs = []
         parts = [self.executable]
-        self._tuple_expand(self.items(), pairs)
         for key, val in pairs:
-            if val is None or val is False:
-                continue
-            parts.append(key)
-            if val is True:
-                pass
-            elif isinstance(val, list):
-                parts.extend(val)
-            else:
-                parts.append(str(val))
+            parts.extend(self._explode(key, val))
         parts.extend(self.pargs)
         return parts
 
