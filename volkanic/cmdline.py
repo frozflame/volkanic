@@ -4,7 +4,8 @@
 import contextlib
 import os
 import sys
-from collections import deque, OrderedDict
+from collections import OrderedDict
+from collections.abc import Sequence
 
 from volkanic.utils import load_symbol
 
@@ -21,16 +22,16 @@ def remember_cwd(path=None):
         os.chdir(prev_cwd)
 
 
-def _flatten_nested_tuple(tup: tuple) -> list:
+def _flatten_recursively(tup: Sequence) -> list:
     """
-    >>> _flatten_nested_tuple((1, (2, (3, 4))))
+    >>> _flatten_recursively((1, (2, (3, 4))))
     [1, 2, 3, 4]
     """
     stack = list(tup)
     values = []
     while stack:
         val = stack.pop()
-        if isinstance(val, tuple):
+        if isinstance(val, Sequence):
             stack.extend(val)
         else:
             values.append(val)
@@ -56,24 +57,27 @@ class CommandOptionDict(OrderedDict):
             pairs = [(key, v) for v in val]
             cls._tuple_expand(pairs, target_pairs)
 
-    @staticmethod
-    def _explode(key, val):
+    @classmethod
+    def _expand(cls, key, val):
+        if isinstance(val, tuple):
+            for v in _flatten_recursively(val):
+                yield key, val
+        else:
+            yield key, val
+
+    @classmethod
+    def _explode(cls, key, val):
         if val is None or val is False:
             return []
         if val is True:
             return [key]
-        if isinstance(val, list):
-            return [key] + val
-        if isinstance(val, tuple):
-            values = []
-            for v in _flatten_nested_tuple(val):
-                values.extend((key, v))
-            return values
+        if isinstance(val, Sequence):
+            return [key] + list(val)
         return [key, str(val)]
 
     def as_args(self):
-        pairs = []
         parts = [self.executable]
+        pairs = (self._expand(k, v) for k, v in self)
         for key, val in pairs:
             parts.extend(self._explode(key, val))
         parts.extend(self.pargs)
