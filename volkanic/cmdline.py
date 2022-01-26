@@ -77,7 +77,7 @@ class CommandOptionDict(OrderedDict):
 
     def as_args(self):
         parts = [self.executable]
-        pairs = (self._expand(k, v) for k, v in self)
+        pairs = (self._expand(k, v) for k, v in self.items())
         for key, val in pairs:
             parts.extend(self._explode(key, val))
         parts.extend(self.pargs)
