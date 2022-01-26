@@ -5,7 +5,7 @@ import contextlib
 import os
 import sys
 from collections import OrderedDict
-from collections.abc import Sequence
+from typing import Union
 
 from volkanic.utils import load_symbol
 
@@ -22,7 +22,7 @@ def remember_cwd(path=None):
         os.chdir(prev_cwd)
 
 
-def _flatten_recursively(tup: Sequence) -> list:
+def _flatten_recursively(tup: Union[tuple, list]) -> list:
     """
     >>> _flatten_recursively((1, (2, (3, 4))))
     [1, 2, 3, 4]
@@ -31,7 +31,7 @@ def _flatten_recursively(tup: Sequence) -> list:
     values = []
     while stack:
         val = stack.pop()
-        if isinstance(val, Sequence):
+        if isinstance(val, (tuple, list)):
             stack.extend(val)
         else:
             values.append(val)
@@ -60,7 +60,7 @@ class CommandOptionDict(OrderedDict):
     @classmethod
     def _expand(cls, key, val):
         if isinstance(val, tuple):
-            for v in _flatten_recursively(val):
+            for val in _flatten_recursively(val):
                 yield key, val
         else:
             yield key, val
@@ -71,15 +71,15 @@ class CommandOptionDict(OrderedDict):
             return []
         if val is True:
             return [key]
-        if isinstance(val, Sequence):
+        if isinstance(val, (list, tuple)):
             return [key] + list(val)
         return [key, str(val)]
 
     def as_args(self):
         parts = [self.executable]
-        pairs = (self._expand(k, v) for k, v in self.items())
-        for key, val in pairs:
-            parts.extend(self._explode(key, val))
+        for pair in self.items():
+            for key, val in self._expand(*pair):
+                parts.extend(self._explode(key, val))
         parts.extend(self.pargs)
         return parts
 
