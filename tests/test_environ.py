@@ -3,10 +3,10 @@
 
 import volkanic
 from volkanic import utils
-from volkanic.environ import GIMixinDirs
+from volkanic.environ import GlobalInterfaceTrial
 
 
-class GlobalInterface(volkanic.GlobalInterface, GIMixinDirs):
+class GlobalInterface(GlobalInterfaceTrial):
     default_config = {'data_dir': '/data/local/volkanic'}
     package_name = 'os.path'
 
