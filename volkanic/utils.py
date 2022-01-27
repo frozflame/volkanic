@@ -21,7 +21,7 @@ def attr_setdefault(obj, attrname, value):
         return value
 
 
-# deprecated names
+# deprecated names; both will be remove at ver 0.5.0
 query_attr = attr_query
 subattr = query_attr
 
@@ -196,6 +196,7 @@ def ignore_arguments(func):
     return _func
 
 
+# discard_arguments will be remove at ver 0.5.0
 discard_arguments = ignore_arguments
 
 

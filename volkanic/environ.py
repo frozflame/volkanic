@@ -238,16 +238,8 @@ class GlobalInterface(metaclass=_GIMeta):
         logging.basicConfig(level=level, format=fmt)
 
 
-# deprecated
-# this class will be removed at ver 0.4.0
-class GIMixinDirs:
-    @abstract_property
-    def conf(self) -> dict:
-        return NotImplemented
-
-    @abc.abstractmethod
-    def under_project_dir(self, *paths) -> str:
-        return NotImplemented
+class GlobalInterfaceTrial(GlobalInterface):
+    package_name = 'volkanic'
 
     def _under_data_dir(self, conf_key, *paths, mkdirs=False) -> str:
         dirpath = self.conf[conf_key]
@@ -273,14 +265,3 @@ class GIMixinDirs:
     def under_temp_dir(self, ext=''):
         name = os.urandom(17).hex() + ext
         return self.under_data_dir('tmp', name, mkdirs=True)
-
-    # both will be removed
-    get_temp_path = under_temp_dir
-    under_temp_path = under_temp_dir
-
-
-class GlobalInterfaceTrial(GlobalInterface, GIMixinDirs):
-    package_name = 'volkanic'
-
-
-GlobalInterfacePlus = GlobalInterfaceTrial
