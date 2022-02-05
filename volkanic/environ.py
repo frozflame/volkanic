@@ -134,7 +134,7 @@ class GlobalInterface(metaclass=_GIMeta):
         return [
             os.environ.get(envvar_name),
             cls.under_project_dir(names[-1]),
-            utils.under_home_dir('.' + relative_path),
+            utils.under_home_dir_hidden(relative_path),
             os.path.join('/etc', relative_path),
             os.path.join('/', relative_path),
         ]
