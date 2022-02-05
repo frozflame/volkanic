@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import abc
 import logging
 import os
 import re
 import weakref
+from typing import Union
 
 from volkanic import utils
-from volkanic.compat import cached_property, abstract_property
+from volkanic.compat import cached_property
 
 _logger = logging.getLogger(__name__)
 
@@ -48,18 +48,23 @@ class _GIMeta(SingletonMeta):
         if not re.match(r'\w[\w.]*\w$', pn):
             msg = 'invalid {}.package_name: "{}"'.format(name, pn)
             raise ValueError(msg)
+        attrs['_namespaces'] = re.split(r'[._]+', pn)
         return super().__new__(mcs, name, bases, attrs)
 
 
-class _PackageNameDerivant:
+class _GINamespaces:
+    def __get__(self, _, owner: _GIMeta) -> list:
+        return getattr(owner, '_namespaces')
+
+
+class _GIName:
     __slots__ = ['sep']
-    regex = re.compile(r'[._]+')
 
     def __init__(self, sep: str):
         self.sep = sep
 
-    def __get__(self, _, owner: 'GlobalInterface'):
-        return self.regex.sub(self.sep, owner.package_name)
+    def __get__(self, _, owner: _GIMeta) -> Union[str, list]:
+        return self.sep.join(getattr(owner, '_namespaces'))
 
 
 class GlobalInterface(metaclass=_GIMeta):
@@ -68,11 +73,14 @@ class GlobalInterface(metaclass=_GIMeta):
 
     # for path and url
     # '[._]+' in package_name replaced by hyphen '-'
-    project_name = _PackageNameDerivant('-')
+    project_name = _GIName('-')
 
     # for symbols in code
     # '[._]+' in package_name replaced by underscore '_'
-    identifier = _PackageNameDerivant('_')
+    identifier = _GIName('_')
+
+    # split package_name with '[._]+'
+    namespaces = _GINamespaces()
 
     _options = {
         # for project dir locating (under_project_dir())
@@ -101,20 +109,21 @@ class GlobalInterface(metaclass=_GIMeta):
             except (KeyError, TypeError):
                 pass
 
+    # deprecated; will be remove in ver 0.5.0
     @classmethod
-    def _split_name(cls):
-        return _PackageNameDerivant.regex.split(cls.package_name)
+    def _split_name(cls) -> list:
+        return cls.namespaces
 
     @classmethod
-    def _fmt_name(cls, sep='-'):
-        return _PackageNameDerivant.regex.sub(sep, cls.package_name)
+    def _fmt_name(cls, sep='-') -> str:
+        return sep.join(cls.namespaces)
 
     @classmethod
-    def _get_conf_path_names(cls):
+    def _get_conf_path_names(cls) -> list:
         return [cls.project_name, cls._get_option('confpath_filename')]
 
     @classmethod
-    def _get_conf_paths(cls):
+    def _get_conf_paths(cls) -> list:
         """
         Make sure this method can be called without arguments.
         Override this method in your subclasses for your specific project.
@@ -152,11 +161,11 @@ class GlobalInterface(metaclass=_GIMeta):
                 return os.path.abspath(path)
 
     @staticmethod
-    def _parse_conf(path: str):
+    def _parse_conf(path: str) -> dict:
         return utils.load_json5_file(path)
 
     @staticmethod
-    def _check_conf(config: dict):
+    def _check_conf(config: dict) -> dict:
         return config
 
     @cached_property
