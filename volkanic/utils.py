@@ -102,6 +102,37 @@ def under_home_dir(*paths):
     return _abs_path_join(homedir, *paths)
 
 
+def _hide_first_level_relpath(path: str):
+    """
+    Add '.' prefix to the first level of a relative path
+    >>> _hide_first_level_relpath("a/relative//path/here")
+    '.a/relative/path/here'
+    >>> _hide_first_level_relpath("/a/abs/path/here")
+    '/a/abs/path/here'
+    """
+    path = os.path.normpath(path)
+    if os.path.isabs(path):
+        return path
+    parts = path.split(os.path.sep)
+    if not parts:
+        return under_home_dir()
+    if parts[0] == '..':
+        raise ValueError('".." is not supported')
+    # noinspection PyTypeChecker
+    if not parts[0].startswith('.'):
+        # noinspection PyTypeChecker
+        parts[0] = '.' + parts[0]
+    return os.path.join(*parts)
+
+
+def under_home_dir_hidden(*paths):
+    if not paths:
+        return under_home_dir()
+    path = os.path.join(*paths)
+    path = _hide_first_level_relpath(path)
+    return under_home_dir(path)
+
+
 def under_package_dir(package, *paths):
     if isinstance(package, str):
         package = importlib.import_module(package)
