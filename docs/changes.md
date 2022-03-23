@@ -1,5 +1,8 @@
-Changes of volkanic
--------------------
+volkanic: recent changes
+------------------------
+
+### 0.5.0 -- plan
+* remove `GlobalInterface.{_split_name,jinja2_env,_get_conf_search_paths}`
 
 ### 0.4.1
 * remove GIMixinDirs

@@ -240,3 +240,14 @@ def printfmt(*args, sep=' ', end=os.linesep):
     sep = str(sep)
     end = str(end)
     return sep.join(str(x) for x in args) + end
+
+
+def guess_content_type(content: bytes):
+    if content.startswith(b'%PDF-'):
+        return 'application/pdf'
+    if content.startswith(b'\x89PNG\r\n\x1a\n'):
+        return 'image/png'
+    if content.startswith(b'\xFF\xD8\xFF\xE0'):
+        return 'image/jpeg'
+    if content.startswith(b'\xFF\xD8\xFF\xEE'):
+        return 'image/jpeg'

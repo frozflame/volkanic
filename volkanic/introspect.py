@@ -259,6 +259,16 @@ class ErrorInfo(object):
     def print_exc(self):
         print(self.exc_string, file=sys.stderr)
 
+    def iter_related_files(self) -> list:
+        lines = self.exc_string.splitlines()
+        regex = re.compile(
+            r'File "(?P<p>.*?)", line (?P<n>\d+)'
+        )
+        keys = ['p', 'n']
+        for line in lines:
+            if mat := regex.match(line.strip()):
+                yield ':'.join(mat.groupdict()[k] for k in keys)
+
     def to_dict(self, code=3):
         if isinstance(self.exc, ErrorBase):
             return self.exc.to_dict()

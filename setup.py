@@ -39,8 +39,7 @@ def find_version():
 config = {
     'name': 'volkanic',
     'version': find_version(),
-    'description':
-        "Interface with config files and shell prompts easily and elegantly",
+    'description': "access config and CLI easily and elegantly",
     'keywords': '',
     'url': "https://github.com/frozflame/volkanic",
     'author': 'frozflame',
