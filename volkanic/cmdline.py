@@ -102,7 +102,7 @@ class CommandOptionDict(OrderedDict):
         return self
 
 
-class CommandRegistry(object):
+class CommandRegistry:
     def __init__(self, commands, prog=''):
         self.commands = commands
         self.default_prog = prog

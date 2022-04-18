@@ -208,7 +208,7 @@ class ErrorBase(Exception):
         )
 
 
-class ErrorInfo(object):
+class ErrorInfo:
     module_prefix = ''
     message = 'Application Error'
 

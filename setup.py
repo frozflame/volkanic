@@ -50,6 +50,7 @@ config = {
     'entry_points': {
         'console_scripts': ['volk = volkanic.__main__:registry']
     },
+    'python_requires': ">=3.5",
     'install_requires': read("requirements.txt"),
     'classifiers': [
         'Programming Language :: Python',
