@@ -5,6 +5,7 @@ import logging
 import os
 import re
 import weakref
+from pathlib import Path
 from typing import Union
 
 from volkanic import utils
@@ -198,6 +199,16 @@ class GlobalInterface(metaclass=_GIMeta):
         n += len(cls.package_name.split('.'))
         paths = ['..'] * n + list(paths)
         return utils.abs_path_join(pkg_dir, *paths)
+
+    @cached_property
+    def package_dir(self) -> Path:
+        return Path(utils.under_package_dir(self.package_name))
+
+    @cached_property
+    def project_dir(self) -> Path:
+        dir_ = self.under_project_dir()
+        if dir_:
+            return Path(dir_)
 
     @classmethod
     def _get_self(cls):
