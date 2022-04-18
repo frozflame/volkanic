@@ -258,7 +258,7 @@ class GlobalInterface(metaclass=_GIMeta):
         logging.basicConfig(level=level, format=fmt)
 
 
-class GlobalInterfaceTrial(GlobalInterface):
+class GlobalInterfaceTribal(GlobalInterface):
     package_name = 'volkanic'
 
     def _under_data_dir(self, conf_key, *paths, mkdirs=False) -> str:
@@ -285,3 +285,6 @@ class GlobalInterfaceTrial(GlobalInterface):
     def under_temp_dir(self, ext=''):
         name = os.urandom(17).hex() + ext
         return self.under_data_dir('tmp', name, mkdirs=True)
+
+
+GlobalInterfaceTrial = GlobalInterfaceTribal
