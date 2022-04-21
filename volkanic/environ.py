@@ -68,6 +68,19 @@ class _GIName:
         return self.sep.join(getattr(owner, '_namespaces'))
 
 
+class _GIPath:
+    __slots__ = ['func', 'result']
+
+    def __init__(self, clsmethod: classmethod):
+        self.func = clsmethod.__func__
+        self.result = self
+
+    def __get__(self, _, owner: _GIMeta) -> Path:
+        if self.result is self:
+            self.result = Path(self.func(owner))
+        return self.result
+
+
 class GlobalInterface(metaclass=_GIMeta):
     # python dot-deliminated path, [a-z.]+
     package_name = 'volkanic'
@@ -200,15 +213,10 @@ class GlobalInterface(metaclass=_GIMeta):
         paths = ['..'] * n + list(paths)
         return utils.abs_path_join(pkg_dir, *paths)
 
-    @cached_property
-    def package_dir(self) -> Path:
-        return Path(utils.under_package_dir(self.package_name))
-
-    @cached_property
-    def project_dir(self) -> Path:
-        dir_ = self.under_project_dir()
-        if dir_:
-            return Path(dir_)
+    # noinspection PyTypeChecker
+    package_dir = _GIPath(under_package_dir)
+    # noinspection PyTypeChecker
+    project_dir = _GIPath(under_project_dir)
 
     @classmethod
     def _get_self(cls):
