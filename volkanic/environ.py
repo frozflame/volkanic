@@ -14,6 +14,10 @@ from volkanic.compat import cached_property
 _logger = logging.getLogger(__name__)
 
 
+# add this in 0.6.0 -- py >= 3.6
+# PathType = Union[str, os.PathLike]
+
+
 class SingletonMeta(type):
     registered_instances = {}
 
