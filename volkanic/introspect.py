@@ -117,16 +117,16 @@ def razor(obj, depth=3, limit=512):
     if isinstance(obj, dict):
         if depth > -1:
             obj = _trim_dict(obj, limit)
-            return {k: razor(v, depth) for k, v in obj.items()}
+            return {k: razor(v, depth, limit) for k, v in obj.items()}
         else:
             return 'dict[{}]'.format(len(obj)) if obj else {}
     if isinstance(obj, list):
         if depth > -1:
             obj = _trim_list(obj, limit)
-            return [razor(el, depth) for el in obj]
+            return [razor(el, depth, limit) for el in obj]
         else:
             return 'list[{}]'.format(len(obj)) if obj else []
-    return razor(repr(obj))
+    return razor(repr(obj), depth, limit)
 
 
 def inspect_object(obj, depth=3):
