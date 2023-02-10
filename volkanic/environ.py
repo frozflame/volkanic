@@ -15,7 +15,7 @@ _logger = logging.getLogger(__name__)
 
 
 # add this in 0.6.0 -- py >= 3.6
-# PathType = Union[str, os.PathLike]
+# PathType = Union[str, os.PathLike]  # PathKind
 
 
 class SingletonMeta(type):
@@ -53,6 +53,7 @@ class _GIMeta(SingletonMeta):
         if not re.match(r'\w[\w.]*\w$', pn):
             msg = 'invalid {}.package_name: "{}"'.format(name, pn)
             raise ValueError(msg)
+        attrs['_classcache'] = {}
         attrs['_namespaces'] = re.split(r'[._]+', pn)
         return super().__new__(mcs, name, bases, attrs)
 
@@ -73,16 +74,19 @@ class _GIName:
 
 
 class _GIPath:
-    __slots__ = ['func', 'result']
+    __slots__ = ['func', 'name']
 
     def __init__(self, clsmethod: classmethod):
         self.func = clsmethod.__func__
-        self.result = self
+
+    def __set_name__(self, owner, name):
+        self.name = name
 
     def __get__(self, _, owner: _GIMeta) -> Path:
-        if self.result is self:
-            self.result = Path(self.func(owner))
-        return self.result
+        classcache = getattr(owner, '_classcache')
+        if self.name not in classcache:
+            classcache[self.name] = Path(self.func(owner))
+        return classcache[self.name]
 
 
 class GlobalInterface(metaclass=_GIMeta):

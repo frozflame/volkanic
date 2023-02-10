@@ -42,7 +42,6 @@ def test_names():
     _eq(GI1.identifier, 'hello_world_demo1')
 
 
-
 def test_bad_package_name():
     try:
         class BadGI0(volkanic.GlobalInterface):
