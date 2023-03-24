@@ -15,7 +15,7 @@ _logger = logging.getLogger(__name__)
 
 
 # add this in 0.6.0 -- py >= 3.6
-# PathType = Union[str, os.PathLike]  # PathKind
+# PathType = Union[str, os.PathLike]
 
 
 class SingletonMeta(type):
@@ -162,7 +162,7 @@ class GlobalInterface(metaclass=_GIMeta):
         ]
 
     # _get_conf_search_paths is deprecated
-    # _get_conf_search_paths will be remove at ver 0.5.0
+    # _get_conf_search_paths will be removed at ver 0.5.0
     _get_conf_search_paths = _get_conf_paths
 
     @classmethod
@@ -171,7 +171,7 @@ class GlobalInterface(metaclass=_GIMeta):
         Returns: (str) absolute path to config file
         """
         # _get_conf_search_paths is deprecated
-        # _get_conf_search_paths will be remove at ver 0.5.0
+        # _get_conf_search_paths will be removed at ver 0.5.0
         func = getattr(cls, '_get_conf_search_paths', None)
         if func is None:
             func = cls._get_conf_paths

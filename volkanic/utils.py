@@ -21,7 +21,7 @@ def attr_setdefault(obj, attrname, value):
         return value
 
 
-# deprecated names; both will be remove at ver 0.5.0
+# deprecated names; both will be removed at ver 0.5.0
 query_attr = attr_query
 subattr = query_attr
 
@@ -187,12 +187,20 @@ def where_site_packages():
             return p
 
 
+def json_default(obj):
+    # https://bugs.python.org/issue27362
+    try:
+        return obj.__json__()
+    except AttributeError:
+        return str(obj)
+
+
 def indented_json_dumps(obj, dumps=None, **kwargs):
     if dumps is None:
         import json
         dumps = json.dumps
     kwargs.setdefault('indent', 4)
-    kwargs.setdefault('default', str)
+    kwargs.setdefault('default', json_default)
     kwargs.setdefault('sort_keys', True)
     kwargs.setdefault('ensure_ascii', False)
     return dumps(obj, **kwargs)
@@ -227,7 +235,7 @@ def ignore_arguments(func):
     return _func
 
 
-# discard_arguments will be remove at ver 0.5.0
+# discard_arguments will be removed at ver 0.5.0
 discard_arguments = ignore_arguments
 
 
