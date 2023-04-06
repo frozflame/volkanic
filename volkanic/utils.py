@@ -21,11 +21,6 @@ def attr_setdefault(obj, attrname, value):
         return value
 
 
-# deprecated names; both will be removed at ver 0.5.0
-query_attr = attr_query
-subattr = query_attr
-
-
 def merge_dicts(*dicts):
     # a list of dicts is acceptable
     if len(dicts) == 1 and isinstance(dicts[0], list):
@@ -49,7 +44,7 @@ def load_symbol(symbolpath):
     parts = symbolpath.split(':', 1)
     symbol = importlib.import_module(parts.pop(0))
     if parts:
-        symbol = query_attr(symbol, *parts[0].split('.'))
+        symbol = attr_query(symbol, *parts[0].split('.'))
     return symbol
 
 
@@ -226,17 +221,13 @@ def load_json5_file(path: str):
 
 
 def ignore_arguments(func):
-    """Discard arguments and call a argument-less function"""
+    """Discard arguments and call an argument-less function"""
 
     @functools.wraps(func)
     def _func(*_args, **_kwargs):
         return func()
 
     return _func
-
-
-# discard_arguments will be removed at ver 0.5.0
-discard_arguments = ignore_arguments
 
 
 def printerr(*args, **kwargs):

@@ -131,11 +131,6 @@ class GlobalInterface(metaclass=_GIMeta):
             except (KeyError, TypeError):
                 pass
 
-    # deprecated; will be remove in ver 0.5.0
-    @classmethod
-    def _split_name(cls) -> list:
-        return cls.namespaces
-
     @classmethod
     def _fmt_name(cls, sep='-') -> str:
         return sep.join(cls.namespaces)
@@ -161,17 +156,11 @@ class GlobalInterface(metaclass=_GIMeta):
             os.path.join('/', relative_path),
         ]
 
-    # _get_conf_search_paths is deprecated
-    # _get_conf_search_paths will be removed at ver 0.5.0
-    _get_conf_search_paths = _get_conf_paths
-
     @classmethod
     def _locate_conf(cls):
         """
         Returns: (str) absolute path to config file
         """
-        # _get_conf_search_paths is deprecated
-        # _get_conf_search_paths will be removed at ver 0.5.0
         func = getattr(cls, '_get_conf_search_paths', None)
         if func is None:
             func = cls._get_conf_paths
@@ -252,18 +241,6 @@ class GlobalInterface(metaclass=_GIMeta):
             'conf_path': cls._locate_conf(),
             'conf': conf,
         }
-
-    # deprecated
-    # this method will be removed at ver 0.5.0
-    @cached_property
-    def jinja2_env(self):
-        # noinspection PyPackageRequirements
-        from jinja2 import Environment, PackageLoader, select_autoescape
-        return Environment(
-            loader=PackageLoader(self.package_name, 'templates'),
-            autoescape=select_autoescape(['html', 'xml']),
-            **self.conf.get('_jinja2_env', {})
-        )
 
     @classmethod
     def setup_logging(cls, level=None, fmt=None):
