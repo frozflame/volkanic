@@ -16,7 +16,7 @@ def test_path_formatters():
 
 
 def test_errorbase():
-    eb = ErrorBase()
+    eb = ErrorBase('something wrong')
     d = eb.to_dict()
     assert ErrorBase.from_dict(d).to_dict() == d
     eb = ErrorBase('bad-request', 'EB-1234')
