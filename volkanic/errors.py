@@ -10,14 +10,14 @@ class KnownError(ErrorBase):
 
 
 class BusinessError(KnownError):
-    extra = {'code': 1}
+    default_error_code = 1
 
 
 C1Error = BusinessError
 
 
 class TechnicalError(KnownError):
-    extra = {'code': 2}
+    default_error_code = 2
 
     def __str__(self):
         s = super().__str__()

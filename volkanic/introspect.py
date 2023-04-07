@@ -178,14 +178,20 @@ def get_caller_locals(depth: int):
 
 
 class ErrorBase(Exception):
-    extra = {}
+    default_error_code = 3
+
+    def __init__(self, message: str, code: int = None, data: dict = None):
+        super().__init__(message)
+        self.code = code or self.default_error_code
+        self.data = data or {}
+
+    @property
+    def message(self) -> str:
+        return self.args[0]
 
     @property
     def error_key(self):
-        try:
-            return str(self.args[1])
-        except IndexError:
-            return self.__class__.__name__
+        return self.data.get('error_key', self.__class__.__name__)
 
     def __str__(self):
         if not self.args:
@@ -193,18 +199,18 @@ class ErrorBase(Exception):
         return str(self.args[0])
 
     def to_dict(self):
-        if len(self.args) > 2 and isinstance(self.args[2], dict):
-            return self.args[2]
-        dic = {'message': str(self), 'error_key': self.error_key}
-        dic.update(self.extra)
-        return dic
+        return {
+            'code': self.code,
+            'data': self.data,
+            'message': self.message,
+        }
 
     @classmethod
     def from_dict(cls, dic: dict):
         return cls(
-            dic.get('message', ''),
-            dic.get('error_key', cls.__name__),
-            dic,
+            dic['message'],
+            dic['code'],
+            dic.get('data', {}),
         )
 
 
@@ -274,7 +280,7 @@ class ErrorInfo:
             return self.exc.to_dict()
         return {
             'code': code,
-            'error_key': self.error_key,
+            'data': {'error_key': self.error_key},
             'message': f'{self.message} <{self.error_key}>',
         }
 
