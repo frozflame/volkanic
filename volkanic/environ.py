@@ -115,8 +115,10 @@ class GlobalInterface(metaclass=_GIMeta):
     default_config = {
         '_jinja2_env': {},
     }
-    default_logfmt = \
-        '%(asctime)s %(levelname)s [%(process)s,%(thread)s] %(name)s %(message)s'
+    default_logfmt = (
+        "%(asctime)s %(levelname)s [%(process)s,%(thread)s] "
+        "%(name)s %(funcName)s() %(message)s"
+    )
 
     @classmethod
     def _fmt_envvar_name(cls, name):
