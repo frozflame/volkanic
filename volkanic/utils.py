@@ -250,3 +250,28 @@ def guess_content_type(content: bytes):
         return 'image/jpeg'
     if content.startswith(b'\xFF\xD8\xFF\xEE'):
         return 'image/jpeg'
+
+
+# noinspection PyPep8Naming
+class per_process_cached_property:
+    """
+    A property that is only computed once per instance per process.
+    Deleting the attribute resets the property.
+    """
+
+    def __init__(self, func):
+        self.__doc__ = getattr(func, "__doc__")
+        self.func = func
+
+    def __get__(self, obj, cls):
+        if obj is None:
+            return self
+        key = self.func.__name__
+        current_pid = os.getpid()
+        if key in obj.__dict__:
+            val, pid = obj.__dict__[key]
+            if current_pid == pid:
+                return val
+        val = self.func(obj)
+        obj.__dict__.setdefault(key, (val, current_pid))
+        return obj.__dict__[key][0]
