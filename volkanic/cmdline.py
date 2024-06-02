@@ -11,7 +11,7 @@ from volkanic.utils import load_symbol
 
 
 @contextlib.contextmanager
-def remember_cwd(path=None):
+def temporary_cwd(path=None):
     """Temporarily change Current Working Directory (CWD/PWD)"""
     prev_cwd = os.getcwd()
     if path:
@@ -20,6 +20,11 @@ def remember_cwd(path=None):
         yield
     finally:
         os.chdir(prev_cwd)
+
+
+# for backward compatiblity.
+# will be removed in ver 0.7.0
+remember_cwd = temporary_cwd
 
 
 def _flatten_recursively(tup: Union[tuple, list]) -> list:
