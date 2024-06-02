@@ -25,11 +25,7 @@ except ImportError:
         def __get__(self, obj, cls):
             if obj is None:
                 return self
-            try:
-                return obj.__dict__[self.func.__name__]
-            except KeyError:
-                val = self.func(obj)
-                return obj.__dict__.setdefault(self.func.__name__, val)
+            return obj.__dict__.setdefault(self.func.__name__, self.func(obj))
 
 
 def abstract_property(func):
