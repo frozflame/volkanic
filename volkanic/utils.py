@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 # coding: utf-8
-
 import functools
 import importlib
 import os
 import sys
+import threading
+from pathlib import Path
+from typing import Union
+
+Pathlike = Union[str, Path]
 
 
 def attr_query(obj, *attrnames):
@@ -212,7 +216,7 @@ def indented_json_print(obj, dumps=None, **kwargs):
     print(dumps(obj, **kwargs), **print_kwargs)
 
 
-def load_json5_file(path: str):
+def load_json5_file(path: Pathlike):
     if path.endswith('.json'):
         import json
         return json.loads(open(path).read())
@@ -253,20 +257,40 @@ def guess_content_type(content: bytes):
 
 
 # noinspection PyPep8Naming
-class per_process_cached_property:
+class _property:
+    def __init__(self, func):
+        self.__doc__ = getattr(func, "__doc__")
+        self.func = func
+
+
+# noinspection PyPep8Naming
+class per_process_cached_property(_property):
     """
     A property that is only computed once per instance per process.
     Deleting the attribute resets the property.
     """
 
-    def __init__(self, func):
-        self.__doc__ = getattr(func, "__doc__")
-        self.func = func
-
     def __get__(self, obj, cls):
         if obj is None:
             return self
         key = os.getpid(), self.func.__name__
+        try:
+            return obj.__dict__[key]
+        except KeyError:
+            return obj.__dict__.setdefault(key, self.func(obj))
+
+
+# noinspection PyPep8Naming
+class per_thread_cached_property(_property):
+    """
+    A property that is only computed once per instance per thread.
+    Deleting the attribute resets the property.
+    """
+
+    def __get__(self, obj, cls):
+        if obj is None:
+            return self
+        key = threading.get_ident(), self.func.__name__
         try:
             return obj.__dict__[key]
         except KeyError:

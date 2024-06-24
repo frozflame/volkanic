@@ -63,8 +63,8 @@ class T:
 
 def test_cached_property():
     t = T()
-    assert t.prop1 == t.prop1
-    assert t.prop2 == t.prop2
+    assert t.prop1 is t.prop1
+    assert t.prop2 is t.prop2
     tx = ThreadPoolExecutor(max_workers=4)
     px = ProcessPoolExecutor(max_workers=4)
     args = [t] * 100, ['prop2'] * 100
