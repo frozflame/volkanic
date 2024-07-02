@@ -45,19 +45,20 @@ def select_from_dict(dict_: dict, fields: list, pop=False):
 
 
 def load_symbol(symbolpath):
-    parts = symbolpath.split(':', 1)
+    parts = symbolpath.split(":", 1)
     symbol = importlib.import_module(parts.pop(0))
     if parts:
-        symbol = attr_query(symbol, *parts[0].split('.'))
+        symbol = attr_query(symbol, *parts[0].split("."))
     return symbol
 
 
 def load_variables(*contexts):
     import re
+
     scope = {}
     for ctx in contexts:
         if not isinstance(ctx, dict):
-            ctx = {re.split(r'[.:]', x)[-1]: x for x in ctx}
+            ctx = {re.split(r"[.:]", x)[-1]: x for x in ctx}
         for key, val in ctx.items():
             scope[key] = load_symbol(val)
     return scope
@@ -70,9 +71,9 @@ def _abs_path_join(*paths):
 
 def abs_path_join(*paths) -> str:
     if not paths:
-        msg = 'abs_path_join() requires at least 1 argument'
+        msg = "abs_path_join() requires at least 1 argument"
         raise TypeError(msg)
-    if paths[0].startswith('~'):
+    if paths[0].startswith("~"):
         paths = list(paths)
         paths[0] = os.path.expanduser(paths[0])
     return _abs_path_join(*paths)
@@ -80,7 +81,7 @@ def abs_path_join(*paths) -> str:
 
 def abs_path_join_and_mkdirs(*paths):
     path = abs_path_join(*paths)
-    if paths[-1].endswith('/'):
+    if paths[-1].endswith("/"):
         os.makedirs(path, exist_ok=True)
     else:
         os.makedirs(os.path.split(path)[0], exist_ok=True)
@@ -94,10 +95,10 @@ def under_parent_dir(ref_path: str, *paths) -> str:
 
 
 def under_home_dir(*paths):
-    if sys.platform == 'win32':
+    if sys.platform == "win32":
         homedir = os.environ["HOMEPATH"]
     else:
-        homedir = os.path.expanduser('~')
+        homedir = os.path.expanduser("~")
     return _abs_path_join(homedir, *paths)
 
 
@@ -115,20 +116,20 @@ def _hide_first_level_relpath(path: str):
     parts = path.split(os.path.sep)
     if not parts:
         return under_home_dir()
-    if parts[0] == '..':
+    if parts[0] == "..":
         raise ValueError('".." is not supported')
     # noinspection PyTypeChecker
-    if not parts[0].startswith('.'):
+    if not parts[0].startswith("."):
         # noinspection PyTypeChecker
-        parts[0] = '.' + parts[0]
+        parts[0] = "." + parts[0]
     return os.path.join(*parts)
 
 
-def under_home_dir_hidden(*paths):
+def under_home_dir_hidden(*paths: Pathlike):
     if not paths:
         return under_home_dir()
     path = os.path.join(*paths)
-    path = _hide_first_level_relpath(path)
+    path = _hide_first_level_relpath(str(path))
     return under_home_dir(path)
 
 
@@ -141,24 +142,27 @@ def under_package_dir(package, *paths):
 
 def _linux_open(path):
     import subprocess
-    subprocess.run(['xdg-open', path])
+
+    subprocess.run(["xdg-open", path])
 
 
 def _macos_open(path):
     import subprocess
-    subprocess.run(['open', path])
+
+    subprocess.run(["open", path])
 
 
 def _windows_open(path):
-    getattr(os, 'startfile')(path)
+    getattr(os, "startfile")(path)
 
 
 def desktop_open(*paths):
     import platform
+
     osname = platform.system().lower()
-    if osname == 'darwin':
+    if osname == "darwin":
         handler = _macos_open
-    elif osname == 'windows':
+    elif osname == "windows":
         handler = _windows_open
     else:
         handler = _linux_open
@@ -168,21 +172,21 @@ def desktop_open(*paths):
 
 def where(name):
     mod = importlib.import_module(name)
-    path = getattr(mod, '__file__', 'NotAvailable')
+    path = getattr(mod, "__file__", "NotAvailable")
     dir_, filename = os.path.split(path)
-    if filename.startswith('__init__.'):
+    if filename.startswith("__init__."):
         return dir_
     return path
 
 
 def where_site_packages():
-    for name in ['pip', 'easy_install']:
+    for name in ["pip", "easy_install"]:
         try:
             return os.path.split(where(name))[0]
         except ModuleNotFoundError:
             continue
     for p in sys.path:
-        if p.endswith('site-packages'):
+        if p.endswith("site-packages"):
             return p
 
 
@@ -197,17 +201,18 @@ def json_default(obj):
 def indented_json_dumps(obj, dumps=None, **kwargs):
     if dumps is None:
         import json
+
         dumps = json.dumps
-    kwargs.setdefault('indent', 4)
-    kwargs.setdefault('default', json_default)
-    kwargs.setdefault('sort_keys', True)
-    kwargs.setdefault('ensure_ascii', False)
+    kwargs.setdefault("indent", 4)
+    kwargs.setdefault("default", json_default)
+    kwargs.setdefault("sort_keys", True)
+    kwargs.setdefault("ensure_ascii", False)
     return dumps(obj, **kwargs)
 
 
 def indented_json_print(obj, dumps=None, **kwargs):
     print_kwargs = {}
-    print_keywords = ['sep', 'end', 'file', 'flush']
+    print_keywords = ["sep", "end", "file", "flush"]
     for key in print_keywords:
         if key in kwargs:
             print_kwargs[key] = kwargs.pop(key)
@@ -217,10 +222,12 @@ def indented_json_print(obj, dumps=None, **kwargs):
 
 
 def load_json5_file(path: Pathlike):
-    if path.endswith('.json'):
+    if path.endswith(".json"):
         import json
+
         return json.loads(open(path).read())
     import json5
+
     return json5.load(open(path))
 
 
@@ -235,25 +242,25 @@ def ignore_arguments(func):
 
 
 def printerr(*args, **kwargs):
-    kwargs.setdefault('file', sys.stderr)
+    kwargs.setdefault("file", sys.stderr)
     print(*args, **kwargs)
 
 
-def printfmt(*args, sep=' ', end=os.linesep):
+def printfmt(*args, sep=" ", end=os.linesep):
     sep = str(sep)
     end = str(end)
     return sep.join(str(x) for x in args) + end
 
 
 def guess_content_type(content: bytes):
-    if content.startswith(b'%PDF-'):
-        return 'application/pdf'
-    if content.startswith(b'\x89PNG\r\n\x1a\n'):
-        return 'image/png'
-    if content.startswith(b'\xFF\xD8\xFF\xE0'):
-        return 'image/jpeg'
-    if content.startswith(b'\xFF\xD8\xFF\xEE'):
-        return 'image/jpeg'
+    if content.startswith(b"%PDF-"):
+        return "application/pdf"
+    if content.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "image/png"
+    if content.startswith(b"\xFF\xD8\xFF\xE0"):
+        return "image/jpeg"
+    if content.startswith(b"\xFF\xD8\xFF\xEE"):
+        return "image/jpeg"
 
 
 # noinspection PyPep8Naming

@@ -18,7 +18,7 @@ class TechnicalError(KnownError):
 
     def __str__(self):
         s = super().__str__()
-        return f'{s} <{self.error_key}>'
+        return f"{s} <{self.error_key}>"
 
 
 class UnknownError(ErrorBase):
@@ -30,11 +30,11 @@ C2Error = TechnicalError
 C3Error = UnknownError
 
 __all__ = [
-    'KnownError',
-    'BusinessError',
-    'TechnicalError',
-    'UnknownError',
-    'C1Error',
-    'C2Error',
-    'C3Error',
+    "KnownError",
+    "BusinessError",
+    "TechnicalError",
+    "UnknownError",
+    "C1Error",
+    "C2Error",
+    "C3Error",
 ]

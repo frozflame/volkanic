@@ -16,13 +16,13 @@ def test_path_formatters():
 
 
 def test_errorbase():
-    eb = ErrorBase('something wrong')
+    eb = ErrorBase("something wrong")
     d = eb.to_dict()
     assert ErrorBase.from_dict(d).to_dict() == d
-    eb = ErrorBase('bad-request', 'EB-1234')
+    eb = ErrorBase("bad-request", "EB-1234")
     d = eb.to_dict()
     assert ErrorBase.from_dict(d).to_dict() == d
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_path_formatters()

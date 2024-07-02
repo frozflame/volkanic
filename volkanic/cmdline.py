@@ -49,7 +49,7 @@ class CommandOptionDict(OrderedDict):
     def __init__(self, *args, **kwargs):
         super(CommandOptionDict, self).__init__(*args, **kwargs)
         self.pargs = []
-        self.executable = 'echo'
+        self.executable = "echo"
 
     @classmethod
     def _tuple_expand(cls, source_pairs, target_pairs: list):
@@ -90,14 +90,16 @@ class CommandOptionDict(OrderedDict):
 
     def __str__(self):
         import shlex
+
         args = [shlex.quote(s) for s in self.as_args()]
-        return ' '.join(args)
+        return " ".join(args)
 
     def run(self, dry=False, quiet=False, **kwargs):
         if not quiet:
             print(self, file=sys.stderr)
         if not dry:
             import subprocess
+
             return subprocess.run(self.as_args(), **kwargs)
 
     def __call__(self, executable, *pargs):
@@ -108,12 +110,12 @@ class CommandOptionDict(OrderedDict):
 
 
 class CommandRegistry:
-    def __init__(self, commands, prog=''):
+    def __init__(self, commands, prog=""):
         self.commands = commands
         self.default_prog = prog
 
     @classmethod
-    def from_cmddef(cls, cmddef, prog=''):
+    def from_cmddef(cls, cmddef, prog=""):
         commands = {}
         for line in cmddef.splitlines():
             line = line.strip()
@@ -124,20 +126,20 @@ class CommandRegistry:
         return cls(commands, prog)
 
     @classmethod
-    def from_entries(cls, entries, prog=''):
+    def from_entries(cls, entries, prog=""):
         return cls({v: k for k, v in entries.items()}, prog)
 
     def show_commands(self, prog):
-        indent = ' ' * 4
-        lines = ['available commands:', '']
+        indent = " " * 4
+        lines = ["available commands:", ""]
         for cmd in sorted(self.commands):
-            lines.append(indent + ' '.join([prog, cmd]))
-        print(*lines, sep='\n', end='\n\n')
+            lines.append(indent + " ".join([prog, cmd]))
+        print(*lines, sep="\n", end="\n\n")
 
     def get_real_prog(self, argv):
         if not argv:
-            return self.default_prog or '<prog>'
-        if argv[0].endswith('.py'):
+            return self.default_prog or "<prog>"
+        if argv[0].endswith(".py"):
             return self.default_prog or argv[0]
         return os.path.basename(argv[0])
 
@@ -151,8 +153,8 @@ class CommandRegistry:
             sys.exit(1)
 
         # intended use: argparse.ArgumentParser(prog=prog)
-        prog = '{} {}'.format(real_prog, argv[1])
+        prog = "{} {}".format(real_prog, argv[1])
 
-        if ':' not in dotpath:
-            dotpath += ':run'
+        if ":" not in dotpath:
+            dotpath += ":run"
         return load_symbol(dotpath)(prog, argv[2:])
