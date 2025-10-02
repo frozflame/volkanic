@@ -7,6 +7,13 @@ To install (add `sudo` if necessary)
 
     python3 -m pip install volkanic
 
+Python version requirement (plan)
+
+    0.5.0   Python 3.5+
+    0.6.0   Python 3.6+
+    0.7.0   Python 3.7+
+    0.8.0   Python 3.8+
+    0.9.0   Python 3.9+
 
 ### GlobalInterface and config file
 
@@ -33,6 +40,7 @@ Configuration file `config.json5`:
 ```
 
 This `config.json5` is at one of the follow locations:
+
 - Under your project directory in a development enviornment
 - `~/.example/config.json5`
 - `/etc/example/config.json5`
@@ -47,14 +55,15 @@ Access config:
 {'upstram_prefix': 'http://127.0.0.1:9100', 'sqlite': '/data/local/example/db.sqlite'}
 ```
 
-Note that `GlobalInterface` is a singlon class, which means that 
+Note that `GlobalInterface` is a singlon class, which means that
 `GlobalInterface()` will always return the same object:
+
 ```
 >>> GlobalInterface() is GlobalInterface()
 True
 ```
 
-The recommended usage of `GlobalInterface()` is to create instanciate it 
+The recommended usage of `GlobalInterface()` is to create instanciate it
 at the top each module:
 
 ```python
@@ -70,8 +79,8 @@ def find_funny_things():
     # more code here ...
 ```
 
-
 -------------------------------------------------------------------------
+
 ### Accessories
 
 List sub-commands
@@ -87,7 +96,6 @@ Locate a Python package directory with `volk where`:
 
     $ volk where requests
     requests	/usr/local/lib/python3.6/site-packages/requests
-
 
 You can open a file or URL with default application with `volk o`.
 
@@ -106,10 +114,10 @@ Show `sys.argv`:
     5	'python'
 
 -------------------------------------------------------------------------
+
 ### Sub-command protocal
 
 Say you have a package named `mypkg`
-
 
     mypkg/
     ├── MANIFEST.in
@@ -124,17 +132,17 @@ Say you have a package named `mypkg`
     ├── setup.py
     └── tests/
 
-
 In one of your functional modules, e.g. `mypkg/mypkg/formatter.py`,
 provide a entry function which takes exactly 2 arguments:
-
 
 ```python
 import argparse
 
+
 def process_file(path):
     # actual code here
     return
+
 
 def run(prog=None, args=None):
     desc = 'human readable formatter'
@@ -145,9 +153,7 @@ def run(prog=None, args=None):
     process_file(ns.input_file)
 ```
 
-
 Sub-command registry in `mypkg/mypkg/main.py`:
-
 
 ```python
 import volkanic
@@ -162,7 +168,6 @@ registry = volkanic.CommandRegistry(commands)
 
 Note that `mypkg.formatter` is a shorthand for `mypkg.formatter:run`.
 
-
 Configure top level command in `mypkg/setup.py`:
 
 ```python
@@ -174,7 +179,6 @@ setup(
     # more arguments here
 )
 ```
-
 
 Install package `mypkg` or link with `python3 setup.py develop`.
 

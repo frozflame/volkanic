@@ -47,12 +47,11 @@ config = {
     "packages": find_packages(include=["volkanic"]),
     "zip_safe": False,
     "entry_points": {"console_scripts": ["volk = volkanic.__main__:registry"]},
-    "python_requires": ">=3.5",
+    "python_requires": ">=3.6",
     "install_requires": read("requirements.txt"),
     "classifiers": [
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
@@ -61,6 +60,7 @@ config = {
         "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3.12",
         "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
     ],
     # ensure copy static file to runtime directory
     "include_package_data": True,

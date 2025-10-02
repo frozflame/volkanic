@@ -5,10 +5,9 @@ import importlib
 import os
 import sys
 import threading
-from pathlib import Path
 from typing import Union
 
-Pathlike = Union[str, Path]
+Pathlike = Union[str, os.PathLike]
 
 
 def attr_query(obj, *attrnames):
@@ -276,15 +275,20 @@ class per_process_cached_property(_property):
     A property that is only computed once per instance per process.
     Deleting the attribute resets the property.
     """
-
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        key = os.getpid(), self.func.__name__
+        key = self.func.__name__
+        pid_key = f"{key}_cached_pid"
+        cached_pid = obj.__dict__.get(pid_key)
+        if cached_pid != os.getpid():
+            obj.__dict__[pid_key] = os.getpid()
+            obj.__dict__.pop(key, None)
         try:
             return obj.__dict__[key]
         except KeyError:
             return obj.__dict__.setdefault(key, self.func(obj))
+
 
 
 # noinspection PyPep8Naming
@@ -297,7 +301,12 @@ class per_thread_cached_property(_property):
     def __get__(self, obj, cls):
         if obj is None:
             return self
-        key = threading.get_ident(), self.func.__name__
+        key = self.func.__name__
+        thread_id_key = f"{key}_cached_thread_id"
+        cached_thread_id = obj.__dict__.get(thread_id_key)
+        if cached_thread_id != threading.get_ident():
+            obj.__dict__[thread_id_key] = threading.get_ident()
+            obj.__dict__.pop(key, None)
         try:
             return obj.__dict__[key]
         except KeyError:

@@ -14,10 +14,6 @@ from volkanic.compat import cached_property
 _logger = logging.getLogger(__name__)
 
 
-# add this in 0.6.0 -- py >= 3.6
-# PathType = Union[str, os.PathLike]
-
-
 class SingletonMeta(type):
     registered_instances = {}
 
@@ -138,18 +134,19 @@ class GlobalInterface(metaclass=_GIMeta):
         return sep.join(cls.namespaces)
 
     @classmethod
-    def _get_conf_path_names(cls) -> list:
+    def _get_conf_path_names(cls) -> list[str]:
         return [cls.project_name, cls._get_option("confpath_filename")]
 
     @classmethod
-    def _get_conf_paths(cls) -> list:
+    def _get_conf_paths(cls) -> list[str]:
         """
         Make sure this method can be called without arguments.
         Override this method in your subclasses for your specific project.
         """
         envvar_name = cls._fmt_envvar_name("confpath")
         names = cls._get_conf_path_names()
-        relative_path = os.path.join(*names)
+        # noinspection PyTypeChecker,PyArgumentList
+        relative_path: str = os.path.join(*names)
         return [
             os.environ.get(envvar_name),
             cls.under_project_dir(names[-1]),
@@ -172,6 +169,7 @@ class GlobalInterface(metaclass=_GIMeta):
                 continue
             if os.path.exists(path):
                 return os.path.abspath(path)
+        raise FileNotFoundError('conf file not found')
 
     @staticmethod
     def _parse_conf(path: str) -> dict:
@@ -206,7 +204,7 @@ class GlobalInterface(metaclass=_GIMeta):
     def under_project_dir(cls, *paths):
         pkg_dir = cls.under_package_dir()
         if re.search(r"[/\\](site|dist)-packages[/\\]", pkg_dir):
-            return
+            return None
         n = cls._get_option("project_source_depth")
         n += len(cls.package_name.split("."))
         paths = [".."] * n + list(paths)

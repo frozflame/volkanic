@@ -1,10 +1,8 @@
 volkanic: changes
 -----------------
 
-ver 0.6.0 -- plan
+ver 0.6.0
 - require Python 3.6+
-
-ver 0.5.4
 - fmt code with Black
 
 ver 0.5.0 -- plan

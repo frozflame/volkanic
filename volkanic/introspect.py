@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # coding: utf-8
 
-import warnings
 import copy
 import datetime
 import hashlib
@@ -12,6 +11,7 @@ import re
 import string
 import sys
 import traceback
+import warnings
 
 import setuptools
 
